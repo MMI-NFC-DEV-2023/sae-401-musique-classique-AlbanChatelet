@@ -2,6 +2,7 @@
   "name": "whole-wind",
   "version": "0.0.1",
   "scripts": {
+    "typegen": "pocketbase typegen",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
@@ -10,7 +11,8 @@
   "dependencies": {
     "@tailwindcss/postcss7-compat": "^2.2.17",
     "@tailwindcss/vite": "^4.0.14",
-    "astro": "^5.5.2"
+    "astro": "^5.5.2",
+    "pocketbase": "^0.25.2"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",

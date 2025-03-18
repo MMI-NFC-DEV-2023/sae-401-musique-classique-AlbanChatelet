@@ -2,3 +2,17 @@
 
 
 @import "tailwindcss";
+/* @import "tailwindcss/preflight";
+@tailwind utilities; */
+
+@theme {
+        --color-bouton_voir: "#ae3939";
+        --color-fond_noir: #000000;
+        --color-jaune_petant: #e7c920;
+        --color-couleur_or: #be8711;
+        --color-fond_cards: #303030;
+        --color-spotify: #1ed760;
+        --color-deezer: #a238ff;
+        --color-amazon: #ff9a00;
+        
+}

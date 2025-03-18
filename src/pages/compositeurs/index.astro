@@ -1,0 +1,82 @@
+---
+import HeaderPage from "../../components/HeaderPage.astro";
+import Layout from "../../layouts/Layout.astro";
+
+const response = await fetch(
+  "http://127.0.0.1:8090/api/collections/compositeurs/records?expand=oeuvres"
+);
+const data = await response.json();
+const compositeurs = data.items || []; // Accéder à la liste des compositeurs
+
+// Assurez-vous d'avoir l'URL correcte pour les fichiers stockés dans PocketBase
+const baseUrl = "http://127.0.0.1:8090"; // URL de base de PocketBase
+---
+
+<head>
+  <link rel="stylesheet" href="/src/styles/global.css" />
+</head>
+<HeaderPage />
+<Layout pageTitle="Liste des compositeurs">
+  <section class="flex flex-col items-center">
+    <h1 class="text-3xl font-semibold mb-8">Liste des compositeurs</h1>
+
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+    >
+      {
+        compositeurs.length > 0 ? (
+          compositeurs.map((compositeur) => (
+            <div
+              key={compositeur.id}
+              class="bg-fond_cards p-6 rounded-lg shadow-lg transform transition-all hover:scale-105 hover:shadow-xl"
+            >
+              {/* Vérification et affichage de l'image */}
+              {compositeur.photo && (
+                <img
+                  src={`${baseUrl}/api/files/compositeurs/${compositeur.id}/${compositeur.photo}`}
+                  alt={`Photo de ${compositeur.nom}`}
+                  class="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
+                />
+              )}
+              <h2 class="text-xl font-bold text-center text-white">
+                {compositeur.nom}
+              </h2>
+              <div class="mt-4">
+                <p class="text-white">
+                  <strong>Instruments:</strong> {compositeur.instruments}
+                </p>
+                <p class="text-white">
+                  <strong>Nationalité:</strong> {compositeur.nationalite}
+                </p>
+                <p class="text-white">
+                  <strong>Date de naissance:</strong>{" "}
+                  {compositeur.date_naissance}
+                </p>
+              </div>
+              <div>
+                <p class="text-white">
+                  <strong>Œuvres:</strong>
+                </p>
+                <ul class="text-white">
+                  {compositeur.expand.oeuvres.length > 0 ? (
+                    compositeur.expand.oeuvres.map((oeuvre) => (
+                      <li key={oeuvre.id}>{oeuvre.titre}</li>
+                    ))
+                  ) : (
+                    <p>Aucune oeuvre disponible</p>
+                  )}
+                </ul>
+              </div>
+              <a href={`/compositeurs/${compositeur.id}`} class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+  Voir les détails
+</a>
+
+            </div>
+          ))
+        ) : (
+          <p>Aucun compositeur trouvé</p>
+        )
+      }
+    </div>
+  </section>
+</Layout>

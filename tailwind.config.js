@@ -1,7 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./src/**/*.{astro,html,js,ts,jsx,tsx}", // Cibler les fichiers Astro et autres
+    "./src/pages/**/*.{astro,html,js,ts,jsx,tsx}",
+    "./src/components/**/*.{astro,html,js,ts,jsx,tsx}",
+    "./src/layouts/**/*.{astro,html,js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
