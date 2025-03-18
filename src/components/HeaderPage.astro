@@ -1,5 +1,5 @@
 ---
-// HeaderPage.astro
+/* Pas de besoin de script setup ici, on va utiliser un script classique dans le fichier */
 ---
 
 <header class="bg-gray-800 text-white p-4 shadow-md">
@@ -9,12 +9,71 @@
       <a href="/" class="text-white hover:text-yellow-400">MonSite</a>
     </div>
 
+    <!-- Menu burger pour mobile -->
+    <button
+      id="burgerButton"
+      class="lg:hidden text-white"
+      aria-label="Ouvrir le menu"
+    >
+      <!-- Affichage du menu burger ou de la croix selon l'état -->
+      <span
+        id="burgerIcon"
+        class="block w-6 h-0.5 bg-white mb-1 transition-transform duration-200"
+      ></span>
+      <span
+        id="burgerIcon2"
+        class="block w-6 h-0.5 bg-white mb-1 transition-transform duration-200"
+      ></span>
+      <span
+        id="burgerIcon3"
+        class="block w-6 h-0.5 bg-white transition-transform duration-200"
+      ></span>
+    </button>
+
     <!-- Liens de navigation -->
-    <div class="space-x-6">
+    <div id="menuLinks" class="space-x-6 hidden lg:flex">
       <a href="/" class="hover:text-yellow-400">Accueil</a>
       <a href="/compositeurs" class="hover:text-yellow-400">Compositeurs</a>
-      <a href="/oeuvres" class="hover:text-yellow-400">Œuvres</a>
-      
+      <a href="/oeuvres" class="hover:text-yellow-400">Oeuvres</a>
     </div>
   </nav>
+
+  <!-- Menu mobile -->
+  <div
+    id="mobileMenu"
+    class="lg:hidden bg-gray-800 text-white space-y-4 p-4 hidden"
+  >
+    <a href="/" class="block hover:text-yellow-400">Accueil</a>
+    <a href="/compositeurs" class="block hover:text-yellow-400">Compositeurs</a>
+    <a href="/oeuvres" class="block hover:text-yellow-400">Oeuvres</a>
+  </div>
 </header>
+
+<script>
+  // Sélection des éléments du DOM
+  const burgerButton = document.getElementById("burgerButton");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const menuLinks = document.getElementById("menuLinks");
+  const burgerIcon = document.getElementById("burgerIcon");
+  const burgerIcon2 = document.getElementById("burgerIcon2");
+  const burgerIcon3 = document.getElementById("burgerIcon3");
+
+  // Fonction pour basculer le menu
+  burgerButton.addEventListener("click", () => {
+    // Toggle le menu mobile
+    mobileMenu.classList.toggle("hidden");
+
+    // Basculer l'affichage de la croix et du burger
+    if (mobileMenu.classList.contains("hidden")) {
+      // Revenir au burger (pas de rotation)
+      burgerIcon.style.transform = "rotate(0deg)";
+      burgerIcon2.style.opacity = "1";
+      burgerIcon3.style.transform = "rotate(0deg)";
+    } else {
+      // Afficher la croix avec les rotations corrigées
+      burgerIcon.style.transform = "rotate(45deg) translateY(8px)";
+      burgerIcon2.style.opacity = "0";
+      burgerIcon3.style.transform = "rotate(-45deg) translateY(-8px)";
+    }
+  });
+</script>
