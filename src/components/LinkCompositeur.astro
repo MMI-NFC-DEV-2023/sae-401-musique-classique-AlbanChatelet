@@ -1,0 +1,20 @@
+---
+interface Props {
+  compositeur: { id: string; nom: string } | null;
+}
+
+const { compositeur } = Astro.props;
+---
+
+{
+  compositeur ? (
+    <a
+      href={`/compositeurs/${compositeur.id}`}
+      class="text-blue-400 hover:underline"
+    >
+      {compositeur.nom}
+    </a>
+  ) : (
+    <span class="text-gray-400">Compositeur inconnu</span>
+  )
+}

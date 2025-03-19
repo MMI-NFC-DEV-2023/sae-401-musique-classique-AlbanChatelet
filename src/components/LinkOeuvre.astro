@@ -1,0 +1,17 @@
+---
+interface Props {
+  oeuvre: { id: string; titre: string } | null;
+}
+
+const { oeuvre } = Astro.props;
+---
+
+{
+  oeuvre ? (
+    <a href={`/oeuvres/${oeuvre.id}`} class="text-blue-400 hover:underline">
+      {oeuvre.titre}
+    </a>
+  ) : (
+    <span class="text-gray-400">Œuvre inconnue</span>
+  )
+}

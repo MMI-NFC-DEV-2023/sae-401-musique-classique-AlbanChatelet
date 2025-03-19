@@ -1,61 +1,74 @@
 ---
 import HeaderPage from "../../components/HeaderPage.astro";
-import Layout from "../../layouts/Layout.astro";
+export const prerender = false;
 
-const baseUrl = import.meta.env.PUBLIC_BASE_URL;
-import type { CompositeursResponse, OeuvresResponse } from "../../pocketbase-typegen";
+import Layout from "../../layouts/Layout.astro";
+import LinkCompositeur from "../../components/LinkCompositeur.astro";
+import type {
+  OeuvresResponse,
+  CompositeursResponse,
+} from "../../pocketbase-typegen";
+
+import "../../styles/global.css"; // Import propre du CSS
 
 const { id } = Astro.params;
-const oeuvre = await Astro.locals.pb.collection<OeuvresResponse<{
-  compositeur?: CompositeursResponse;
-}>>("oeuvres").getOne(id!, {expand: 'compositeur'});
+
+console.log("🔍 ID reçu depuis les paramètres :", id);
+
+if (!id) {
+  console.error("❌ ID manquant pour la page œuvre.");
+  throw new Error("ID manquant pour la page œuvre.");
+}
+
+let oeuvre = null;
+
+try {
+  console.log("📡 Tentative de récupération de l'œuvre depuis PocketBase...");
+
+  oeuvre = await Astro.locals.pb
+    .collection<
+      OeuvresResponse<{ compositeur?: CompositeursResponse }>
+    >("oeuvres")
+    .getOne(id, { expand: "compositeur" });
+
+  console.log("✅ Œuvre récupérée avec succès :", oeuvre);
+} catch (error) {
+  console.error("❌ Erreur lors de la récupération de l'œuvre :", error);
+}
+const baseUrl = "http://127.0.0.1:8090"; // URL de base de PocketBase
 ---
 
-<head>
-  <link rel="stylesheet" href="/src/styles/global.css" />
-</head>
-
 <HeaderPage />
-<Layout pageTitle={`Détails de ${oeuvre.titre}`}>
+<Layout pageTitle={oeuvre ? `Détails de ${oeuvre.titre}` : "Œuvre introuvable"}>
   <section
     class="flex flex-col items-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 text-white py-12"
   >
-    <h1 class="text-4xl font-bold mb-6 tracking-wide">{oeuvre.titre}</h1>
-
-    <div
-      class="bg-gray-800 p-8 rounded-lg shadow-2xl transform transition duration-300 hover:scale-105 w-full max-w-md mx-auto"
-    >
-    
-      {
-        oeuvre.cover && (
-          <img
-            src={`${baseUrl}/api/files/oeuvres/${oeuvre.id}/${oeuvre.cover}`}
-            alt={`Cover de ${oeuvre.titre}`}
-            class="w-40 h-40  mx-auto mb-6 object-cover border-4 border-gray-600"
-          />
-        )
-      }
-
-      <div class="text-center">
-        <p class="text-lg">
-          <strong class="text-blue-400">Date de sortie :</strong>
-          {oeuvre.annee}
-        </p>
-      </div>
-
-      {
-        oeuvre.expand?.compositeur && (
-          <div class="mt-6">
-            <p class="text-lg font-semibold text-blue-400">Compositeur :</p>
-            <div class="mt-2 space-y-2">
-              <div>
-                {oeuvre.expand.compositeur.nom}
-              </div>
-            </div>
-          </div>
-        )
-      }
-
-    </div>
+    {
+      oeuvre ? (
+        <>
+          <h1 class="text-4xl font-bold mb-6 tracking-wide">{oeuvre.titre}</h1>
+          {oeuvre.expand?.compositeur && (
+            <p class="text-lg">
+              Composé par :
+              <LinkCompositeur
+                compositeur={{
+                  id: oeuvre.expand.compositeur.id,
+                  nom: oeuvre.expand.compositeur.nom,
+                }}
+              />
+            </p>
+          )}
+          {oeuvre.cover && (
+            <img
+              src={`${baseUrl}/api/files/oeuvres/${oeuvre.id}/${oeuvre.cover}`}
+              alt={`Photo de ${oeuvre.titre}`}
+              class="w-32 h-32 mx-auto mb-4 object-cover"
+            />
+          )}
+        </>
+      ) : (
+        <p class="text-red-500 text-center">Œuvre introuvable.</p>
+      )
+    }
   </section>
 </Layout>

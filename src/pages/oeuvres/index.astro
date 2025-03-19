@@ -1,14 +1,23 @@
 ---
 import HeaderPage from "../../components/HeaderPage.astro";
 import Layout from "../../layouts/Layout.astro";
+import { pb } from "../../backend";
+import Debug from "astro/components/Debug.astro";
+import LinkCompositeur from "../../components/LinkCompositeur.astro";
+import type {
+  CompositeursResponse,
+  OeuvresResponse,
+} from "../../pocketbase-typegen";
 
-const response = await fetch(
-  "http://127.0.0.1:8090/api/collections/oeuvres/records?expand=compositeur"
-);
-const data = await response.json();
-const oeuvres = data.items || []; // Accéder à la liste des oeuvres
+type Response = OeuvresResponse<{
+  compositeur: CompositeursResponse;
+}>;
+export const prerender = false;
 
-// Assurez-vous d'avoir l'URL correcte pour les fichiers stockés dans PocketBase
+const oeuvres = await Astro.locals.pb
+  .collection<Response>("oeuvres")
+  .getFullList({ expand: "compositeur" });
+
 const baseUrl = "http://127.0.0.1:8090"; // URL de base de PocketBase
 ---
 
@@ -18,51 +27,37 @@ const baseUrl = "http://127.0.0.1:8090"; // URL de base de PocketBase
 <HeaderPage />
 <Layout pageTitle="Liste des oeuvres">
   <section class="flex flex-col items-center">
-    <h1 class="text-3xl font-semibold mb-8">Liste des oeuvres</h1>
-
-    <div
-      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
-    >
-      {
-        oeuvres.length > 0 ? (
-          oeuvres.map((oeuvre) => (
-            <div
-              key={oeuvre.id}
-              class="bg-fond_cards p-6 rounded-lg shadow-lg transform transition-all hover:scale-105 hover:shadow-xl"
-            >
-              {/* Vérification et affichage de l'image */}
-              {oeuvre.cover && (
-                <img
-                  src={`${baseUrl}/api/files/oeuvres/${oeuvre.id}/${oeuvre.cover}`}
-                  alt={`Photo de ${oeuvre.titre}`}
-                  class="w-32 h-32 mx-auto mb-4 object-cover"
-                />
-              )}
-              <h2 class="text-xl font-bold text-center text-white">
-                {oeuvre.titre}
-              </h2>
-              <div class="mt-4">
-                <p class="text-white">
-                  <strong>Date de sortie:</strong> {oeuvre.annee}
-                </p>
-              </div>
-              <div class="mt-4">
-                <p class="text-white">
-                  <strong>Par:</strong> {oeuvre.expand.compositeur.nom}
-                </p>
-              </div>
-              <a
-                href={`/oeuvres/${oeuvre.id}`}
-                class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-              >
-                Voir les détails
-              </a>
-            </div>
-          ))
-        ) : (
-          <p>Aucune oeuvre trouvée</p>
-        )
-      }
-    </div>
+    {
+      oeuvres.map((oeuvre) => (
+        <div>
+          <h2>Titre : {oeuvre.titre}</h2>
+          <p>Année de sortie : {oeuvre.annee}</p>
+          {oeuvre.cover && (
+            <img
+              src={`${baseUrl}/api/files/oeuvres/${oeuvre.id}/${oeuvre.cover}`}
+              alt={`Photo de ${oeuvre.titre}`}
+              class="w-32 h-32 mx-auto mb-4 object-cover"
+            />
+          )}
+          {oeuvre.expand?.compositeur && (
+            <p class="text-lg">
+              Composé par :
+              <LinkCompositeur
+                compositeur={{
+                  id: oeuvre.expand.compositeur.id,
+                  nom: oeuvre.expand.compositeur.nom,
+                }}
+              />
+            </p>
+          )}
+          <a
+            href={`/oeuvres/${oeuvre.id}`}
+            class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+          >
+            Voir les détails
+          </a>
+        </div>
+      ))
+    }
   </section>
 </Layout>
