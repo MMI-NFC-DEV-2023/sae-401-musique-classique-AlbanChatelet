@@ -3,39 +3,29 @@ import HeaderPage from "../../components/HeaderPage.astro";
 import Layout from "../../layouts/Layout.astro";
 
 const baseUrl = import.meta.env.PUBLIC_BASE_URL;
+import type { CompositeursResponse, OeuvresResponse } from "../../pocketbase-typegen";
 
 const { id } = Astro.params;
-const response = await fetch(
-  `${baseUrl}/api/collections/oeuvres/records/${id}?expand=compositeurs`
-);
-const oeuvre = await response.json();
-
-// Générer les pages statiquement
-export async function getStaticPaths() {
-  const res = await fetch(`${baseUrl}/api/collections/compositeurs/records`);
-  const data = await res.json();
-
-  return data.items.map((oeuvre) => ({
-    params: { id: oeuvre.id },
-  }));
-}
-
-export const prerender = false;
+const oeuvre = await Astro.locals.pb.collection<OeuvresResponse<{
+  compositeur?: CompositeursResponse;
+}>>("oeuvres").getOne(id!, {expand: 'compositeur'});
 ---
 
 <head>
   <link rel="stylesheet" href="/src/styles/global.css" />
 </head>
+
 <HeaderPage />
-<Layout pageTitle={`Détails de ${oeuvre.nom}`}>
+<Layout pageTitle={`Détails de ${oeuvre.titre}`}>
   <section
     class="flex flex-col items-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 text-white py-12"
   >
-    <h1 class="text-4xl font-bold mb-6 tracking-wide">{oeuvre.nom}</h1>
+    <h1 class="text-4xl font-bold mb-6 tracking-wide">{oeuvre.titre}</h1>
 
     <div
       class="bg-gray-800 p-8 rounded-lg shadow-2xl transform transition duration-300 hover:scale-105 w-full max-w-md mx-auto"
     >
+    
       {
         oeuvre.cover && (
           <img
@@ -54,22 +44,18 @@ export const prerender = false;
       </div>
 
       {
-        oeuvre.expand?.compositeur?.length > 0 && (
+        oeuvre.expand?.compositeur && (
           <div class="mt-6">
-            <p class="text-lg font-semibold text-blue-400">Oeuvres :</p>
-            <ul class="mt-2 space-y-2">
-              {oeuvre.expand.compositeurs.map((compositeur) => (
-                <li
-                  key={compositeur.id}
-                  class="bg-gray-700 px-4 py-2 rounded-lg shadow-md"
-                >
-                  {compositeur.nom}
-                </li>
-              ))}
-            </ul>
+            <p class="text-lg font-semibold text-blue-400">Compositeur :</p>
+            <div class="mt-2 space-y-2">
+              <div>
+                {oeuvre.expand.compositeur.nom}
+              </div>
+            </div>
           </div>
         )
       }
+
     </div>
   </section>
 </Layout>
