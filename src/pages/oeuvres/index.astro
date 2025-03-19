@@ -1,7 +1,7 @@
 ---
 import HeaderPage from "../../components/HeaderPage.astro";
 import Layout from "../../layouts/Layout.astro";
-import { pb } from "../../backend";
+
 import Debug from "astro/components/Debug.astro";
 import LinkCompositeur from "../../components/LinkCompositeur.astro";
 import type {
@@ -12,6 +12,7 @@ import type {
 type Response = OeuvresResponse<{
   compositeur: CompositeursResponse;
 }>;
+
 export const prerender = false;
 
 const oeuvres = await Astro.locals.pb
@@ -24,38 +25,49 @@ const baseUrl = "http://127.0.0.1:8090"; // URL de base de PocketBase
 <head>
   <link rel="stylesheet" href="/src/styles/global.css" />
 </head>
+
 <HeaderPage />
 <Layout pageTitle="Liste des oeuvres">
-  <section class="flex flex-col items-center">
+  <section
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6"
+  >
     {
       oeuvres.map((oeuvre) => (
-        <div>
-          <h2>Titre : {oeuvre.titre}</h2>
-          <p>Année de sortie : {oeuvre.annee}</p>
-          {oeuvre.cover && (
-            <img
-              src={`${baseUrl}/api/files/oeuvres/${oeuvre.id}/${oeuvre.cover}`}
-              alt={`Photo de ${oeuvre.titre}`}
-              class="w-32 h-32 mx-auto mb-4 object-cover"
-            />
-          )}
-          {oeuvre.expand?.compositeur && (
-            <p class="text-lg">
-              Composé par :
-              <LinkCompositeur
-                compositeur={{
-                  id: oeuvre.expand.compositeur.id,
-                  nom: oeuvre.expand.compositeur.nom,
-                }}
+        <div
+          key={oeuvre.id}
+          class="bg-gray-800 text-white rounded-lg shadow-lg overflow-hidden"
+        >
+          <div class="p-4">
+            <h2 class="text-xl font-bold mb-2">{oeuvre.titre}</h2>
+            <p class="text-gray-400 mb-4">Année de sortie : {oeuvre.annee}</p>
+
+            {oeuvre.cover && (
+              <img
+                src={`${baseUrl}/api/files/oeuvres/${oeuvre.id}/${oeuvre.cover}`}
+                alt={`Photo de ${oeuvre.titre}`}
+                class="w-32 h-32 mx-auto mb-4 rounded-lg object-cover"
               />
-            </p>
-          )}
-          <a
-            href={`/oeuvres/${oeuvre.id}`}
-            class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-          >
-            Voir les détails
-          </a>
+            )}
+
+            {oeuvre.expand?.compositeur && (
+              <div class="text-lg mb-4">
+                <p>Composé par :</p>
+                <LinkCompositeur
+                  compositeur={{
+                    id: oeuvre.expand.compositeur.id,
+                    nom: oeuvre.expand.compositeur.nom,
+                  }}
+                />
+              </div>
+            )}
+
+            <a
+              href={`/oeuvres/${oeuvre.id}`}
+              class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              Voir les détails
+            </a>
+          </div>
         </div>
       ))
     }

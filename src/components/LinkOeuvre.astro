@@ -1,17 +1,14 @@
 ---
-interface Props {
-  oeuvre: { id: string; titre: string } | null;
+interface LinkOeuvreProps {
+  oeuvres: {
+    id: string;
+    titre: string;
+  };
 }
 
-const { oeuvre } = Astro.props;
+const { oeuvres } = Astro.props;
 ---
 
-{
-  oeuvre ? (
-    <a href={`/oeuvres/${oeuvre.id}`} class="text-blue-400 hover:underline">
-      {oeuvre.titre}
-    </a>
-  ) : (
-    <span class="text-gray-400">Œuvre inconnue</span>
-  )
-}
+<a href={`/oeuvres/${oeuvres.id}`} class="text-blue-400 hover:underline">
+  {oeuvres.titre}
+</a>

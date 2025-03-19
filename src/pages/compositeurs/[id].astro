@@ -1,95 +1,94 @@
 ---
 import HeaderPage from "../../components/HeaderPage.astro";
 import Layout from "../../layouts/Layout.astro";
-
-const baseUrl = import.meta.env.PUBLIC_BASE_URL;
+import LinkOeuvre from "../../components/LinkOeuvre.astro";
 import type {
-  CompositeursResponse,
   OeuvresResponse,
+  CompositeursResponse,
 } from "../../pocketbase-typegen";
+import "../../styles/global.css"; // Import propre du CSS
 
-// const { id } = Astro.params;
-// const response = await fetch(
-//   `${baseUrl}/api/collections/compositeurs/records/${id}?expand=oeuvres`
-// );
-// const compositeur = await response.json();
-
-// Générer les pages statiquement
-// export async function getStaticPaths() {
-//   const res = await fetch(`${baseUrl}/api/collections/compositeurs/records`);
-//   const data = await res.json();
-
-//   return data.items.map((compositeur) => ({
-//     params: { id: compositeur.id },
-//   }));
-// }
-
-export const prerender = false;
 const { id } = Astro.params;
-const compositeur = await Astro.locals.pb
-  .collection<
-    CompositeursResponse<{
-      oeuvres?: OeuvresResponse[];
-    }>
-  >("compositeurs")
-  .getOne(id!, { expand: "oeuvres" });
+
+console.log("🔍 ID reçu depuis les paramètres :", id);
+
+if (!id) {
+  console.error("❌ ID manquant pour la page œuvre.");
+  throw new Error("ID manquant pour la page œuvre.");
+}
+
+let compositeur = null;
+
+try {
+  console.log(
+    "📡 Tentative de récupération du compositeur depuis PocketBase..."
+  );
+
+  compositeur = await Astro.locals.pb
+    .collection<
+      CompositeursResponse<{ oeuvres?: OeuvresResponse[] }>
+    >("compositeurs")
+    .getOne(id, { expand: "oeuvres" });
+
+  console.log("✅ Compositeur récupéré avec succès :", compositeur);
+} catch (error) {
+  console.error("❌ Erreur lors de la récupération du compositeur :", error);
+}
+
+const baseUrl = "http://127.0.0.1:8090"; // URL de base de PocketBase
 ---
 
 <head>
   <link rel="stylesheet" href="/src/styles/global.css" />
 </head>
+
 <HeaderPage />
-<Layout pageTitle={`Détails de ${compositeur.nom}`}>
+<Layout
+  pageTitle={compositeur
+    ? `Détails de ${compositeur.nom}`
+    : "Compositeur introuvable"}
+>
   <section
     class="flex flex-col items-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 text-white py-12"
   >
-    <h1 class="text-4xl font-bold mb-6 tracking-wide">{compositeur.nom}</h1>
+    {
+      compositeur ? (
+        <>
+          <h1 class="text-4xl font-bold mb-6 tracking-wide">
+            {compositeur.nom}
+          </h1>
 
-    <div
-      class="bg-gray-800 p-8 rounded-lg shadow-2xl transform transition duration-300 hover:scale-105 w-full max-w-md mx-auto"
-    >
-      {
-        compositeur.photo && (
-          <img
-            src={`${baseUrl}/api/files/compositeurs/${compositeur.id}/${compositeur.photo}`}
-            alt={`Photo de ${compositeur.nom}`}
-            class="w-40 h-40 rounded-full mx-auto mb-6 object-cover border-4 border-gray-600"
-          />
-        )
-      }
+          {/* Vérifier et afficher les œuvres */}
+          {compositeur.expand?.oeuvres &&
+            compositeur.expand.oeuvres.length > 0 && (
+              <p class="text-lg">
+                A composé :
+                <ul>
+                  {compositeur.expand.oeuvres.map((oeuvre) => (
+                    <li key={oeuvre.id}>
+                      <LinkOeuvre
+                        oeuvres={{
+                          id: oeuvre.id,
+                          titre: oeuvre.titre,
+                        }}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </p>
+            )}
 
-      <div class="text-center">
-        <p class="text-lg">
-          <strong class="text-blue-400">Instruments :</strong>
-          {compositeur.instruments}
-        </p>
-        <p class="text-lg">
-          <strong class="text-blue-400">Nationalité :</strong>
-          {compositeur.nationalite}
-        </p>
-        <p class="text-lg">
-          <strong class="text-blue-400">Date de naissance :</strong>
-          {compositeur.date_naissance}
-        </p>
-      </div>
-
-      {
-        (compositeur.expand?.oeuvres ?? []).length > 0 && (
-          <div class="mt-6">
-            <p class="text-lg font-semibold text-blue-400">Oeuvres :</p>
-            <ul class="mt-2 space-y-2">
-              {compositeur.expand?.oeuvres?.map((oeuvre) => (
-                <li
-                  data-key={oeuvre.id}
-                  class="bg-gray-700 px-4 py-2 rounded-lg shadow-md"
-                >
-                  {oeuvre.titre}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )
-      }
-    </div>
+          {compositeur.photo && (
+            <img
+              src={`${baseUrl}/api/files/compositeurs/${compositeur.id}/${compositeur.photo}`}
+              alt={`Photo de ${compositeur.nom}`}
+              class="w-32 h-32 mx-auto mb-4 object-cover"
+            />
+          )}
+        </>
+      ) : (
+        <p class="text-red-500 text-center">Compositeur introuvable.</p>
+      )
+    }
   </section>
 </Layout>
