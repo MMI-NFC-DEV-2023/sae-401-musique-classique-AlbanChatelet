@@ -1,14 +1,14 @@
 ---
 interface LinkOeuvreProps {
-  oeuvres: {
+  oeuvre: {
     id: string;
     titre: string;
   };
 }
 
-const { oeuvres } = Astro.props;
+const { oeuvre } = Astro.props;
 ---
 
-<a href={`/oeuvres/${oeuvres.id}`} class="text-blue-400 hover:underline">
-  {oeuvres.titre}
+<a href={`/oeuvres/${oeuvre.id}`} class="text-blue-400 hover:underline">
+  {oeuvre.titre}
 </a>

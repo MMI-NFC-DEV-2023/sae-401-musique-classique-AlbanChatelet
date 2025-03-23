@@ -1,25 +1,20 @@
 ---
 import HeaderPage from "../../components/HeaderPage.astro";
-import Layout from "../../layouts/Layout.astro";
-
-import Debug from "astro/components/Debug.astro";
 import LinkCompositeur from "../../components/LinkCompositeur.astro";
-import type {
-  CompositeursResponse,
-  OeuvresResponse,
-} from "../../pocketbase-typegen";
-
-type Response = OeuvresResponse<{
-  compositeur: CompositeursResponse;
-}>;
+import Layout from "../../layouts/Layout.astro";
+import PocketBase from "pocketbase"; // Importation de PocketBase
 
 export const prerender = false;
 
-const oeuvres = await Astro.locals.pb
-  .collection<Response>("oeuvres")
-  .getFullList({ expand: "compositeur" });
+// Connexion à PocketBase via Pockethost
+const pb = new PocketBase("https://sae303.pockethost.io"); // Utilisation de l'URL de ton instance Pockethost
 
-const baseUrl = "http://127.0.0.1:8090"; // URL de base de PocketBase
+// Récupération des oeuvres depuis PocketBase
+const oeuvres = await pb.collection("oeuvres").getFullList({
+  expand: "compositeur",
+});
+
+const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
 ---
 
 <head>
@@ -39,35 +34,32 @@ const baseUrl = "http://127.0.0.1:8090"; // URL de base de PocketBase
         >
           <div class="p-4">
             <h2 class="text-xl font-bold mb-2">{oeuvre.titre}</h2>
-            <p class="text-gray-400 mb-4">Année de sortie : {oeuvre.annee}</p>
-
-            {oeuvre.cover && (
-              <img
-                src={`${baseUrl}/api/files/oeuvres/${oeuvre.id}/${oeuvre.cover}`}
-                alt={`Photo de ${oeuvre.titre}`}
-                class="w-32 h-32 mx-auto mb-4 rounded-lg object-cover"
-              />
-            )}
-
-            {oeuvre.expand?.compositeur && (
-              <div class="text-lg mb-4">
-                <p>Composé par :</p>
-                <LinkCompositeur
-                  compositeur={{
-                    id: oeuvre.expand.compositeur.id,
-                    nom: oeuvre.expand.compositeur.nom,
-                  }}
-                />
-              </div>
-            )}
-
-            <a
-              href={`/oeuvres/${oeuvre.id}`}
-              class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              Voir les détails
-            </a>
           </div>
+          {oeuvre.expand?.compositeur && (
+            <p class="text-lg">
+              Composé par :
+              <LinkCompositeur
+                compositeur={{
+                  id: oeuvre.expand.compositeur.id,
+                  nom: oeuvre.expand.compositeur.nom,
+                }}
+              />
+            </p>
+          )}
+          {oeuvre.cover && (
+            <img
+              src={`${baseUrl}/api/files/oeuvres/${oeuvre.id}/${oeuvre.cover}`}
+              alt={`Photo de ${oeuvre.titre}`}
+              class="w-32 h-32 mx-auto mb-4 object-cover"
+            />
+          )}
+          {/* Lien vers la page de détails de l'œuvre */}
+          <a
+            href={`/oeuvres/${oeuvre.id}`}
+            class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Voir les détails
+          </a>
         </div>
       ))
     }

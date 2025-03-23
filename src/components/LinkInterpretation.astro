@@ -1,0 +1,14 @@
+---
+interface LinkInterpretationProps {
+  interpretation: {
+    id: string;
+    nom_interpretation: string;
+  };
+}
+
+const { interpretation } = Astro.props;
+---
+
+<a class="text-blue-400 hover:underline">
+  {interpretation.nom_interpretation}
+</a>

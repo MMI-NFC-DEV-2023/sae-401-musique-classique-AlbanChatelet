@@ -1,41 +1,41 @@
 ---
 import HeaderPage from "../../components/HeaderPage.astro";
 import Layout from "../../layouts/Layout.astro";
-import LinkOeuvre from "../../components/LinkOeuvre.astro";
-import type {
-  OeuvresResponse,
-  CompositeursResponse,
-} from "../../pocketbase-typegen";
+import PocketBase from "pocketbase"; // Importation de PocketBase
 import "../../styles/global.css"; // Import propre du CSS
+import LinkOeuvre from "../../components/LinkOeuvre.astro";
 
+export const prerender = false;
+
+// Connexion à PocketBase via Pockethost
+const pb = new PocketBase("https://sae303.pockethost.io"); // Utilisation de l'URL de ton instance Pockethost
+
+// Récupération de l'ID du compositeur depuis les paramètres
 const { id } = Astro.params;
 
-console.log("🔍 ID reçu depuis les paramètres :", id);
-
 if (!id) {
-  console.error("❌ ID manquant pour la page œuvre.");
-  throw new Error("ID manquant pour la page œuvre.");
+  console.error("❌ ID manquant pour la page compositeur.");
+  throw new Error("ID manquant pour la page compositeur.");
 }
 
 let compositeur = null;
 
 try {
   console.log(
-    "📡 Tentative de récupération du compositeur depuis PocketBase..."
+    "📡 Tentative de récupération du compositeur et de ses œuvres depuis PocketBase..."
   );
 
-  compositeur = await Astro.locals.pb
-    .collection<
-      CompositeursResponse<{ oeuvres?: OeuvresResponse[] }>
-    >("compositeurs")
-    .getOne(id, { expand: "oeuvres" });
+  // Récupération du compositeur avec ses œuvres
+  compositeur = await pb.collection("compositeurs").getOne(id, {
+    expand: "oeuvres",
+  });
 
   console.log("✅ Compositeur récupéré avec succès :", compositeur);
 } catch (error) {
   console.error("❌ Erreur lors de la récupération du compositeur :", error);
 }
 
-const baseUrl = "http://127.0.0.1:8090"; // URL de base de PocketBase
+const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
 ---
 
 <head>
@@ -43,6 +43,7 @@ const baseUrl = "http://127.0.0.1:8090"; // URL de base de PocketBase
 </head>
 
 <HeaderPage />
+
 <Layout
   pageTitle={compositeur
     ? `Détails de ${compositeur.nom}`
@@ -57,17 +58,27 @@ const baseUrl = "http://127.0.0.1:8090"; // URL de base de PocketBase
           <h1 class="text-4xl font-bold mb-6 tracking-wide">
             {compositeur.nom}
           </h1>
+          <p class="text-gray-400 mb-4">
+            Année de naissance : {compositeur.date_naissance}
+          </p>
+          {compositeur.photo && (
+            <img
+              src={`${baseUrl}/api/files/compositeurs/${compositeur.id}/${compositeur.photo}`}
+              alt={`Photo de ${compositeur.nom}`}
+              class="w-32 h-32 mx-auto mb-4 rounded-full object-cover"
+            />
+          )}
 
-          {/* Vérifier et afficher les œuvres */}
+          {/* Affichage des œuvres du compositeur */}
           {compositeur.expand?.oeuvres &&
             compositeur.expand.oeuvres.length > 0 && (
-              <p class="text-lg">
-                A composé :
-                <ul>
+              <div class="mt-6 p-4 bg-gray-800 rounded-lg w-full max-w-3xl">
+                <h2 class="text-2xl font-semibold mb-3">Œuvres :</h2>
+                <ul class="list-disc pl-5 space-y-1">
                   {compositeur.expand.oeuvres.map((oeuvre) => (
                     <li key={oeuvre.id}>
                       <LinkOeuvre
-                        oeuvres={{
+                        oeuvre={{
                           id: oeuvre.id,
                           titre: oeuvre.titre,
                         }}
@@ -75,16 +86,8 @@ const baseUrl = "http://127.0.0.1:8090"; // URL de base de PocketBase
                     </li>
                   ))}
                 </ul>
-              </p>
+              </div>
             )}
-
-          {compositeur.photo && (
-            <img
-              src={`${baseUrl}/api/files/compositeurs/${compositeur.id}/${compositeur.photo}`}
-              alt={`Photo de ${compositeur.nom}`}
-              class="w-32 h-32 mx-auto mb-4 object-cover"
-            />
-          )}
         </>
       ) : (
         <p class="text-red-500 text-center">Compositeur introuvable.</p>

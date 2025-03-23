@@ -1,0 +1,68 @@
+---
+import HeaderPage from "../../components/HeaderPage.astro";
+import Layout from "../../layouts/Layout.astro";
+import PocketBase from "pocketbase"; // Importation de PocketBase
+import "../../styles/global.css"; // Import propre du CSS
+import LinkOeuvre from "../../components/LinkOeuvre.astro";
+
+export const prerender = false;
+
+// Connexion à PocketBase via Pockethost
+const pb = new PocketBase("https://sae303.pockethost.io"); // Utilisation de l'URL de ton instance Pockethost
+
+// Récupération de l'ID du compositeur depuis les paramètres
+const { id } = Astro.params;
+
+if (!id) {
+  console.error("❌ ID manquant pour la page compositeur.");
+  throw new Error("ID manquant pour la page compositeur.");
+}
+
+let formation = null;
+
+try {
+  console.log(
+    "📡 Tentative de récupération du compositeur et de ses œuvres depuis PocketBase..."
+  );
+
+  // Récupération du compositeur avec ses œuvres
+  formation = await pb.collection("formations").getOne(id, {
+    expand: "oeuvres",
+  });
+
+  console.log("✅ Compositeur récupéré avec succès :", formation);
+} catch (error) {
+  console.error("❌ Erreur lors de la récupération du compositeur :", error);
+}
+
+const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
+---
+
+<head>
+  <link rel="stylesheet" href="/src/styles/global.css" />
+</head>
+
+<HeaderPage />
+
+<Layout
+  pageTitle={formation
+    ? `Détails de ${formation.nom_groupe}`
+    : "Compositeur introuvable"}
+>
+  <section
+    class="flex flex-col items-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 text-white py-12"
+  >
+    {
+      formation ? (
+        <>
+          <h1 class="text-4xl font-bold mb-6 tracking-wide">
+            {formation.nom_groupe}
+          </h1>
+          
+        </>
+      ) : (
+        <p class="text-red-500 text-center">Formation introuvable.</p>
+      )
+    }
+  </section>
+</Layout>

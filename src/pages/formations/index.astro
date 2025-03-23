@@ -1,5 +1,6 @@
 ---
 import HeaderPage from "../../components/HeaderPage.astro";
+import LinkInterpretation from "../../components/LinkInterpretation.astro";
 import LinkOeuvre from "../../components/LinkOeuvre.astro";
 import Layout from "../../layouts/Layout.astro";
 import PocketBase from "pocketbase"; // Importation de PocketBase
@@ -10,8 +11,8 @@ export const prerender = false;
 const pb = new PocketBase("https://sae303.pockethost.io"); // Utilisation de l'URL de ton instance Pockethost
 
 // Récupération des compositeurs avec leurs œuvres
-const compositeurs = await pb.collection("compositeurs").getFullList({
-  expand: "oeuvres",
+const formations = await pb.collection("formations").getFullList({
+  expand: "interpretations",
 });
 
 const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
@@ -22,40 +23,32 @@ const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
 </head>
 
 <HeaderPage />
-<Layout pageTitle="Liste des compositeurs">
+<Layout pageTitle="Liste des formations">
   <section
     class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6"
   >
     {
-      compositeurs.map((compositeur) => (
+      formations.map((formation) => (
         <div
-          key={compositeur.id}
+          key={formation.id}
           class="bg-gray-800 text-white rounded-lg shadow-lg overflow-hidden"
         >
           <div class="p-4">
-            <h2 class="text-xl font-bold mb-2">{compositeur.nom}</h2>
+            <h2 class="text-xl font-bold mb-2">{formation.nom_groupe}</h2>
           </div>
 
-          {compositeur.photo && (
-            <img
-              src={`${baseUrl}/api/files/compositeurs/${compositeur.id}/${compositeur.photo}`}
-              alt={`Photo de ${compositeur.nom}`}
-              class="w-32 h-32 mx-auto mb-4 object-cover"
-            />
-          )}
-
           {/* Affichage des œuvres associées */}
-          {compositeur.expand?.oeuvres &&
-            compositeur.expand.oeuvres.length > 0 && (
+          {formation.expand?.interpretations &&
+            formation.expand.interpretations.length > 0 && (
               <div class="p-4">
                 <p class="text-gray-400 mb-2">Œuvres :</p>
                 <ul class="list-disc pl-5 space-y-1">
-                  {compositeur.expand.oeuvres.map((oeuvre) => (
-                    <li key={oeuvre.id}>
-                      <LinkOeuvre
-                        oeuvre={{
-                          id: oeuvre.id,
-                          titre: oeuvre.titre,
+                  {formation.expand.interpretation.map((interpretation) => (
+                    <li key={interpretation.id}>
+                      <LinkInterpretation
+                        interpretation={{
+                          id: interpretation.id,
+                          titre: interpretation.nom_interpretation,
                         }}
                       />
                     </li>
@@ -66,7 +59,7 @@ const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
 
           {/* Lien vers la page de détails du compositeur */}
           <a
-            href={`/compositeurs/${compositeur.id}`}
+            href={`/formations/${formation.id}`}
             class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
           >
             Voir les détails
