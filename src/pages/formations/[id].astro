@@ -1,53 +1,47 @@
 ---
 import HeaderPage from "../../components/HeaderPage.astro";
 import Layout from "../../layouts/Layout.astro";
-import PocketBase from "pocketbase"; // Importation de PocketBase
-import "../../styles/global.css"; // Import propre du CSS
-import LinkOeuvre from "../../components/LinkOeuvre.astro";
+import PocketBase from "pocketbase";
+import "../../styles/global.css";
+import LinkInterpretation from "../../components/LinkInterpretation.astro";
 
 export const prerender = false;
 
-// Connexion à PocketBase via Pockethost
-const pb = new PocketBase("https://sae303.pockethost.io"); // Utilisation de l'URL de ton instance Pockethost
+const pb = new PocketBase("https://sae303.pockethost.io");
 
-// Récupération de l'ID du compositeur depuis les paramètres
 const { id } = Astro.params;
 
 if (!id) {
-  console.error("❌ ID manquant pour la page compositeur.");
-  throw new Error("ID manquant pour la page compositeur.");
+  console.error("❌ ID manquant pour la page formation.");
+  throw new Error("ID manquant pour la page formation.");
 }
 
 let formation = null;
 
 try {
   console.log(
-    "📡 Tentative de récupération du compositeur et de ses œuvres depuis PocketBase..."
+    "📡 Récupération de la formation avec ses interprétations et leurs œuvres..."
   );
 
-  // Récupération du compositeur avec ses œuvres
+  // 🔥 Correction : Ajout de "interpretations.titre_oeuvre" pour récupérer l'œuvre associée à chaque interprétation
   formation = await pb.collection("formations").getOne(id, {
-    expand: "oeuvres",
+    expand: "interpretations.titre_oeuvre",
   });
 
-  console.log("✅ Compositeur récupéré avec succès :", formation);
+  console.log("✅ Formation récupérée :", formation);
 } catch (error) {
-  console.error("❌ Erreur lors de la récupération du compositeur :", error);
+  console.error("❌ Erreur lors de la récupération :", error);
 }
 
-const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
+const baseUrl = "https://sae303.pockethost.io";
 ---
-
-<head>
-  <link rel="stylesheet" href="/src/styles/global.css" />
-</head>
 
 <HeaderPage />
 
 <Layout
   pageTitle={formation
     ? `Détails de ${formation.nom_groupe}`
-    : "Compositeur introuvable"}
+    : "Formation introuvable"}
 >
   <section
     class="flex flex-col items-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 text-white py-12"
@@ -58,7 +52,62 @@ const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
           <h1 class="text-4xl font-bold mb-6 tracking-wide">
             {formation.nom_groupe}
           </h1>
-          
+
+          {formation.photo && (
+            <img
+              src={`${baseUrl}/api/files/formations/${formation.id}/${formation.photo}`}
+              alt={`Photo de ${formation.nom_groupe}`}
+              class="w-32 h-32 mx-auto mb-4 rounded-full object-cover"
+            />
+          )}
+
+          {formation.expand?.interpretations &&
+          formation.expand.interpretations.length > 0 ? (
+            <div class="p-4 bg-gray-800 rounded-lg w-full max-w-3xl">
+              <h2 class="text-2xl font-semibold mb-3">Interprétations :</h2>
+              <ul class="list-disc pl-5 space-y-1">
+                {formation.expand.interpretations.map((interpretation) => (
+                  <li key={interpretation.id}>
+                    <div>
+                      <LinkInterpretation interpretation={interpretation} />
+                      {interpretation.annee_sortie && (
+                        <p class="text-sm text-gray-400">
+                          Année de sortie : {interpretation.annee_sortie}
+                        </p>
+                      )}
+                    </div>
+
+                    {interpretation.expand?.titre_oeuvre && (
+                      <div class="flex items-center space-x-3 mt-2">
+                        {interpretation.expand.titre_oeuvre.cover && (
+                          <img
+                            src={`${baseUrl}/api/files/oeuvres/${interpretation.expand.titre_oeuvre.id}/${interpretation.expand.titre_oeuvre.cover}`}
+                            alt={`Cover de ${interpretation.expand.titre_oeuvre.titre}`}
+                            class="w-16 h-16 rounded-lg object-cover"
+                          />
+                        )}
+
+                        <p class="text-sm text-gray-400">
+                          Œuvre originale :{" "}
+                          <a
+                            href={`/oeuvres/${interpretation.expand.titre_oeuvre.id}`}
+                            class="text-blue-400 hover:underline"
+                          >
+                            {interpretation.expand.titre_oeuvre.titre}
+                          </a>
+                          {interpretation.expand.titre_oeuvre.annee}
+                        </p>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p class="text-yellow-400 text-center">
+              Aucune interprétation trouvée.
+            </p>
+          )}
         </>
       ) : (
         <p class="text-red-500 text-center">Formation introuvable.</p>
