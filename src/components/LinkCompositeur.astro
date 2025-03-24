@@ -10,11 +10,11 @@ const { compositeur } = Astro.props;
   compositeur ? (
     <a
       href={`/compositeurs/${compositeur.id}`}
-      class="text-[#303030] "
+      class="text-white "
     >
       {compositeur.nom}
     </a>
   ) : (
-    <span class="text-gray-400">Compositeur inconnu</span>
+    <span class="text-white">Compositeur inconnu</span>
   )
 }

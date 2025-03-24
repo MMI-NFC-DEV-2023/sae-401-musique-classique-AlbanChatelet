@@ -44,7 +44,7 @@ async function fetchData() {
     try {
       console.log("📡 Récupération des formations...");
       formations = await pb.collection("formations").getFullList({
-        filter: `interpretations = "${interpretationIds[0]}"`, // Filtre pour récupérer les formations liées à l'interprétation
+        filter: `interpretations = "${interpretationIds[0]}"`,
       });
 
       console.log(
@@ -57,12 +57,14 @@ async function fetchData() {
   }
 
   try {
-    console.log("📡 Récupération de l'œuvre avec ses interprétations...");
+    console.log(
+      "📡 Récupération de l'œuvre avec ses interprétations et compositeur..."
+    );
     oeuvre = await pb.collection("oeuvres").getOne(id, {
-      expand: "interpretations.titre_oeuvre", // Récupérer les interprétations et l'œuvre associée
+      expand: "compositeur,interpretations.titre_oeuvre",
     });
 
-    console.log("✅ Œuvre récupérée :", oeuvre);
+    console.log("✅ Œuvre récupérée :", JSON.stringify(oeuvre, null, 2));
   } catch (error) {
     console.error("❌ Erreur lors de la récupération de l'œuvre :", error);
   }
@@ -74,19 +76,27 @@ await fetchData();
 const baseUrl = "https://sae303.pockethost.io";
 ---
 
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/src/styles/global.css" />
+</head>
+
 <HeaderPage />
 <Layout pageTitle={oeuvre ? `Détails de ${oeuvre.titre}` : "Œuvre introuvable"}>
   <section
-    class="flex flex-col items-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 text-white py-12"
+    class="flex flex-col items-center min-h-screen bg-black text-white py-12"
   >
     {
       oeuvre ? (
         <>
-          <h1 class="text-4xl font-bold mb-6 tracking-wide">{oeuvre.titre}</h1>
+          <h1 class="text-4xl font-bold mb-6 papyrus text-jaune_petant tracking-wide">
+            {oeuvre.titre}
+          </h1>
 
           {/* Affichage du compositeur */}
           {oeuvre.expand?.compositeur && (
-            <p class="text-lg">
+            <p class="text-lg text-white">
               Composé par :
               <LinkCompositeur
                 compositeur={{
@@ -102,34 +112,60 @@ const baseUrl = "https://sae303.pockethost.io";
             <img
               src={`${baseUrl}/api/files/oeuvres/${oeuvre.id}/${oeuvre.cover}`}
               alt={`Photo de ${oeuvre.titre}`}
-              class="w-32 h-32 mx-auto mb-4 object-cover"
+              class="w-5/6 h-full mx-auto mb-4 object-cover"
             />
           )}
 
           {/* Affichage des autres informations de l'œuvre si disponibles */}
           {oeuvre.annee && <p>Année de sortie : {oeuvre.annee}</p>}
 
+          {/* Affichage des interprétations sous forme de cartes */}
           {interpretations.length > 0 && (
-            <div class="p-4 bg-gray-800 rounded-lg w-full max-w-3xl mt-6">
-              <h2 class="text-2xl font-semibold mb-3">Interprétations :</h2>
-              <ul class="list-disc pl-5 space-y-1">
-                {interpretations.map((interpretation) => {
-                  // Recherche des formations associées à l'interprétation
-                  const formationAssociee = formations.find((f) =>
-                    f.interpretations.includes(interpretation.id)
-                  );
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+              <h2 class="text-3xl font-semibold mb-3 papyrus text-jaune_petant">
+                Interprétations
+              </h2>
+              {interpretations.map((interpretation) => {
+                const formationAssociee = formations.find((f) =>
+                  f.interpretations.includes(interpretation.id)
+                );
 
-                  return (
-                    <li key={interpretation.id} class="text-lg">
-                      <LinkInterpretation interpretation={interpretation} />
+                return (
+                  <div
+                    key={interpretation.id}
+                    class="bg-gray-800 p-6 rounded-lg shadow-lg text-center"
+                  >
+                    <h3 class="text-xl font-semibold mb-2">
+                      {interpretation.titre}
+                    </h3>
+                    <p class="text-xl mulish mb-3">
                       {interpretation.annee_sortie}
-                      {formationAssociee && (
-                        <> - ID de la Formation : {formationAssociee.id}</>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
+                    </p>
+
+                    {/* Affichage du lien Spotify */}
+                    {interpretation.lien_spotify && (
+                      <a
+                        href={interpretation.lien_spotify}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-block mt-3 px-4 py-2 bg-spotify text-black rounded-md hover:bg-green-700"
+                      >
+                        Spotify
+                      </a>
+                    )}
+                    {interpretation.lien_deezer && (
+                      <a
+                        href={interpretation.lien_deezer}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-block mt-3 px-4 py-2 bg-deezer text-white rounded-md hover:bg-purple-700"
+                      >
+                        Deezer
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </>
@@ -139,3 +175,23 @@ const baseUrl = "https://sae303.pockethost.io";
     }
   </section>
 </Layout>
+
+<style>
+  .papyrus {
+    font-family: "Papyrus", sans-serif;
+  }
+
+  .fond_accueil {
+    background-image: url("/src/assets/fond_accueil_sae.png");
+    background-size: cover;
+    background-position: center;
+  }
+
+  .opensans {
+    font-family: "Open Sans Hebrew Condensed", sans-serif;
+  }
+
+  .mulish {
+    font-family: "Mulish", sans-serif;
+  }
+</style>
