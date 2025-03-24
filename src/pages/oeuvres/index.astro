@@ -18,48 +18,48 @@ const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
 ---
 
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <link rel="stylesheet" href="/src/styles/global.css" />
 </head>
 
 <HeaderPage />
 <Layout pageTitle="Liste des oeuvres">
   <section
-    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6"
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6 bg-black"
   >
     {
       oeuvres.map((oeuvre) => (
         <div
           key={oeuvre.id}
-          class="bg-gray-800 text-white rounded-lg shadow-lg overflow-hidden"
+          class="bg-fond_cards p-4 rounded-lg shadow-lg transition duration-300 hover:scale-105"
         >
-          <div class="p-4">
-            <h2 class="text-xl font-bold mb-2">{oeuvre.titre}</h2>
-          </div>
-          {oeuvre.expand?.compositeur && (
-            <p class="text-lg">
-              Composé par :
-              <LinkCompositeur
-                compositeur={{
-                  id: oeuvre.expand.compositeur.id,
-                  nom: oeuvre.expand.compositeur.nom,
-                }}
-              />
-            </p>
-          )}
           {oeuvre.cover && (
             <img
               src={`${baseUrl}/api/files/oeuvres/${oeuvre.id}/${oeuvre.cover}`}
               alt={`Photo de ${oeuvre.titre}`}
-              class="w-32 h-32 mx-auto mb-4 object-cover"
+              class="w-full h-auto object-cover rounded-lg mb-4"
             />
           )}
+          <div class="px-2">
+            <h2 class="text-2xl font-bold text-white">{oeuvre.titre}</h2>
+            <h2 class="text-xl font-semibold text-[#EFDE7C]">
+              Par
+              {oeuvre.expand?.compositeur.nom}
+            </h2>
+            <h2 class="text-lg font-light text-[#EFDE7C]">{oeuvre.annee}</h2>
+          </div>
+
           {/* Lien vers la page de détails de l'œuvre */}
-          <a
-            href={`/oeuvres/${oeuvre.id}`}
-            class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            Voir les détails
-          </a>
+          <div class="text-center py-4">
+            <a
+              href={`/oeuvres/${oeuvre.id}`}
+              class="bg-[#AE3939] h-[30px] opensans text-white font-semibold py-2 px-6 rounded-[8px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105"
+            >
+              Détails
+            </a>
+          </div>
         </div>
       ))
     }
