@@ -1,0 +1,16 @@
+---
+// LinkFormation.astro
+
+interface LinkFormationProps {
+  formation: {
+    id: string;
+    nom_groupe: string;
+  };
+}
+
+const { formation } = Astro.props;
+---
+
+<a class="text-blue-400 hover:underline" href={`/formation/${formation.id}`}>
+  {formation.nom_groupe}
+</a>

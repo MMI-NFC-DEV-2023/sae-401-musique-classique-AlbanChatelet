@@ -2,12 +2,12 @@
 import HeaderPage from "../../components/HeaderPage.astro";
 import Layout from "../../layouts/Layout.astro";
 import LinkCompositeur from "../../components/LinkCompositeur.astro";
-import PocketBase from "pocketbase"; // Importation de PocketBase
-import "../../styles/global.css"; // Import propre du CSS
-
+import PocketBase from "pocketbase";
+import "../../styles/global.css";
+import LinkInterpretation from "../../components/LinkInterpretation.astro";
+import LinkFormation from "../../components/LinkFormation.astro";
 export const prerender = false;
 
-// Récupération de l'ID de l'œuvre depuis les paramètres
 const { id } = Astro.params;
 
 if (!id) {
@@ -15,25 +15,63 @@ if (!id) {
   throw new Error("ID manquant pour la page œuvre.");
 }
 
-// Connexion à PocketBase via Pockethost
-const pb = new PocketBase("https://sae303.pockethost.io"); // Utilisation de l'URL de ton instance Pockethost
+const pb = new PocketBase("https://sae303.pockethost.io");
 
 let oeuvre = null;
+let interpretations = [];
+let formations = [];
 
-try {
-  console.log("📡 Tentative de récupération de l'œuvre depuis PocketBase...");
+async function fetchData() {
+  try {
+    console.log("📡 Récupération des interprétations...");
+    interpretations = await pb.collection("interpretations").getFullList({
+      filter: `titre_oeuvre = "${id}"`,
+    });
 
-  // Récupération de l'œuvre avec son compositeur
-  oeuvre = await pb.collection("oeuvres").getOne(id, {
-    expand: "compositeur", // Récupération des données liées au compositeur
-  });
+    console.log(
+      "✅ Interprétations récupérées :",
+      JSON.stringify(interpretations, null, 2)
+    );
+  } catch (error) {
+    console.error("❌ Erreur interprétations :", error);
+  }
 
-  console.log("✅ Œuvre récupérée avec succès :", oeuvre);
-} catch (error) {
-  console.error("❌ Erreur lors de la récupération de l'œuvre :", error);
+  if (interpretations.length > 0) {
+    const interpretationIds = interpretations.map((i) => i.id);
+
+    console.log("🧐 IDs des interprétations récupérés :", interpretationIds);
+
+    try {
+      console.log("📡 Récupération des formations...");
+      formations = await pb.collection("formations").getFullList({
+        filter: `interpretations = "${interpretationIds[0]}"`, // Filtre pour récupérer les formations liées à l'interprétation
+      });
+
+      console.log(
+        "✅ Formations récupérées :",
+        JSON.stringify(formations, null, 2)
+      );
+    } catch (error) {
+      console.error("❌ Erreur formations :", error);
+    }
+  }
+
+  try {
+    console.log("📡 Récupération de l'œuvre avec ses interprétations...");
+    oeuvre = await pb.collection("oeuvres").getOne(id, {
+      expand: "interpretations.titre_oeuvre", // Récupérer les interprétations et l'œuvre associée
+    });
+
+    console.log("✅ Œuvre récupérée :", oeuvre);
+  } catch (error) {
+    console.error("❌ Erreur lors de la récupération de l'œuvre :", error);
+  }
 }
 
-const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
+// Exécution immédiate de la récupération des données
+await fetchData();
+
+const baseUrl = "https://sae303.pockethost.io";
 ---
 
 <HeaderPage />
@@ -70,7 +108,30 @@ const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
 
           {/* Affichage des autres informations de l'œuvre si disponibles */}
           {oeuvre.annee && <p>Année de sortie : {oeuvre.annee}</p>}
-          {/* Ajouter d'autres informations spécifiques de l'œuvre ici */}
+
+          {interpretations.length > 0 && (
+            <div class="p-4 bg-gray-800 rounded-lg w-full max-w-3xl mt-6">
+              <h2 class="text-2xl font-semibold mb-3">Interprétations :</h2>
+              <ul class="list-disc pl-5 space-y-1">
+                {interpretations.map((interpretation) => {
+                  // Recherche des formations associées à l'interprétation
+                  const formationAssociee = formations.find((f) =>
+                    f.interpretations.includes(interpretation.id)
+                  );
+
+                  return (
+                    <li key={interpretation.id} class="text-lg">
+                      <LinkInterpretation interpretation={interpretation} />
+                      {interpretation.annee_sortie}
+                      {formationAssociee && (
+                        <> - ID de la Formation : {formationAssociee.id}</>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
         </>
       ) : (
         <p class="text-red-500 text-center">Œuvre introuvable.</p>
