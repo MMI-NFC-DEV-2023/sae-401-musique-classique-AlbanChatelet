@@ -7,6 +7,27 @@ const pb = new PocketBase("https://sae303.pockethost.io");
 import HeaderPage from "../components/HeaderPage.astro";
 export const prerender = false; // Pas de pré-rendu pour cette page
 
+// Vérifie si un code d'autorisation GitHub est présent dans l'URL
+const urlParams = new URLSearchParams(Astro.request.url);
+const code = urlParams.get("code");
+
+if (code) {
+  // Si le code est présent, tente de se connecter avec GitHub
+  try {
+    const githubAuthResponse = await pb
+      .collection("users")
+      .authWithOAuth("github", code);
+    Astro.locals.successMessage = "Connexion réussie via GitHub !";
+  } catch (error) {
+    if (error instanceof Error) {
+      Astro.locals.errorMessage = `Erreur lors de la connexion via GitHub : ${error.message}`;
+    } else {
+      Astro.locals.errorMessage =
+        "Erreur inconnue lors de la connexion via GitHub.";
+    }
+  }
+}
+
 // Gestion de la soumission du formulaire
 if (Astro.request.method === "POST") {
   const data = await Astro.request.formData();
@@ -217,6 +238,21 @@ const isLoggedIn = pb.authStore.isValid; // Vérifie si l'utilisateur est connec
               class="w-full bg-green-600 text-black font-semibold py-3 px-5 rounded-lg shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
             >
               Se connecter
+            </button>
+          </form>
+
+          {/* Formulaire de connexion avec GitHub */}
+          <form
+            method="post"
+            action="https://sae303.pockethost.io/api/collections/users/auth/github"
+            class="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg"
+          >
+            <input type="hidden" name="action" value="github" />
+            <button
+              type="submit"
+              class="w-full bg-gray-800 text-white font-semibold py-3 px-5 rounded-lg shadow-lg hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+            >
+              Se connecter avec GitHub
             </button>
           </form>
         </>
