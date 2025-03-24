@@ -10,63 +10,82 @@ export const prerender = false; // Pas de pré-rendu pour cette page
 // Gestion de la soumission du formulaire
 if (Astro.request.method === "POST") {
   const data = await Astro.request.formData();
-
-  // Récupération des champs du formulaire
   const email = data.get("email") as string;
   const password = data.get("password") as string;
   const passwordConfirmation = data.get("passwordConfirmation") as string;
+  const action = data.get("action") as string; // Identifier si c'est pour s'inscrire ou se connecter
 
-  // Vérification de la correspondance des mots de passe
-  if (password !== passwordConfirmation) {
-    console.log("Les mots de passe ne correspondent pas.");
-    Astro.locals.errorMessage = "Les mots de passe ne correspondent pas.";
-    return;
-  }
+  // Vérification des champs
+  if (action === "signup") {
+    // Inscription
+    if (password !== passwordConfirmation) {
+      Astro.locals.errorMessage = "Les mots de passe ne correspondent pas.";
+      return;
+    }
 
-  // Vérification des autres champs (par exemple, email et mot de passe)
-  if (!email || !email.includes("@")) {
-    console.log("L'email est invalide.");
-    Astro.locals.errorMessage = "L'email est invalide.";
-    return;
-  }
+    if (!email || !email.includes("@")) {
+      Astro.locals.errorMessage = "L'email est invalide.";
+      return;
+    }
 
-  if (password.length < 6) {
-    console.log("Le mot de passe doit être d'au moins 6 caractères.");
-    Astro.locals.errorMessage =
-      "Le mot de passe doit être d'au moins 6 caractères.";
-    return;
-  }
+    if (password.length < 6) {
+      Astro.locals.errorMessage =
+        "Le mot de passe doit être d'au moins 6 caractères.";
+      return;
+    }
 
-  // Création de l'utilisateur dans PocketBase
-  try {
-    const response = await pb.collection("users").create({
-      email: email,
-      password: password,
-      passwordConfirm: password, // Assure-toi que la confirmation du mot de passe est égale au mot de passe
-    });
-    console.log("Réponse de PocketBase lors de l'inscription :", response);
-
-    // Ajouter un message de succès ou une redirection
-    Astro.locals.successMessage =
-      "Inscription réussie ! Vous pouvez maintenant vous connecter.";
-    // Rediriger ou rester sur la même page en fonction de tes besoins
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error("Erreur lors de l'inscription :", error.message);
-      // Afficher la réponse complète dans la console pour plus de détails
-      console.error("Détails de l'erreur d'inscription :", error);
-      Astro.locals.errorMessage = `Erreur lors de l'inscription : ${error.message}`;
-    } else {
-      console.error("Erreur inconnue lors de l'inscription", error);
-      Astro.locals.errorMessage = "Erreur inconnue lors de l'inscription.";
+    // Création de l'utilisateur dans PocketBase
+    try {
+      const response = await pb.collection("users").create({
+        email: email,
+        password: password,
+        passwordConfirm: password, // Assure-toi que la confirmation du mot de passe est égale au mot de passe
+      });
+      Astro.locals.successMessage =
+        "Inscription réussie ! Vous pouvez maintenant vous connecter.";
+    } catch (error) {
+      if (error instanceof Error) {
+        Astro.locals.errorMessage = `Erreur lors de l'inscription : ${error.message}`;
+      } else {
+        Astro.locals.errorMessage = "Erreur inconnue lors de l'inscription.";
+      }
+    }
+  } else if (action === "login") {
+    // Connexion
+    try {
+      const authResponse = await pb
+        .collection("users")
+        .authWithPassword(email, password);
+      Astro.locals.successMessage = "Connexion réussie !";
+      // Tu peux rediriger l'utilisateur ici, par exemple vers une page d'accueil
+    } catch (error) {
+      if (error instanceof Error) {
+        Astro.locals.errorMessage = `Erreur lors de la connexion : ${error.message}`;
+      } else {
+        Astro.locals.errorMessage = "Erreur inconnue lors de la connexion.";
+      }
+    }
+  } else if (action === "logout") {
+    // Déconnexion
+    try {
+      pb.authStore.clear(); // Déconnecte l'utilisateur
+      Astro.locals.successMessage = "Déconnexion réussie !";
+    } catch (error) {
+      if (error instanceof Error) {
+        Astro.locals.errorMessage = `Erreur lors de la déconnexion : ${error.message}`;
+      } else {
+        Astro.locals.errorMessage = "Erreur inconnue lors de la déconnexion.";
+      }
     }
   }
 }
+
+const isLoggedIn = pb.authStore.isValid; // Vérifie si l'utilisateur est connecté
 ---
 
-<Layout pageTitle="Inscription">
+<Layout pageTitle="Inscription / Connexion">
   <div class="container">
-    <h1>Inscription</h1>
+    <h1>Inscription / Connexion</h1>
 
     {/* Affichage des messages d'erreur ou de succès */}
     {
@@ -84,33 +103,66 @@ if (Astro.request.method === "POST") {
       )
     }
 
-    {/* Formulaire d'inscription */}
-    <form method="post" class="form">
-      <label for="email">
-        Email
-        <input type="email" name="email" id="email" required />
-      </label>
-      <label for="password">
-        Mot de passe
-        <input
-          type="password"
-          name="password"
-          id="password"
-          minlength="6"
-          required
-        />
-      </label>
-      <label for="passwordConfirmation">
-        Confirmer le mot de passe
-        <input
-          type="password"
-          name="passwordConfirmation"
-          id="passwordConfirmation"
-          minlength="6"
-          required
-        />
-      </label>
-      <button type="submit">S'inscrire</button>
-    </form>
+    {/* Si l'utilisateur est connecté, afficher un bouton de déconnexion */}
+    {
+      isLoggedIn ? (
+        <form method="post" class="form">
+          <input type="hidden" name="action" value="logout" />
+          <button type="submit">Se déconnecter</button>
+        </form>
+      ) : (
+        <>
+          {/* Formulaire d'inscription */}
+          <form method="post" class="form">
+            <input type="hidden" name="action" value="signup" />
+            <label for="email">
+              Email
+              <input type="email" name="email" id="email" required />
+            </label>
+            <label for="password">
+              Mot de passe
+              <input
+                type="password"
+                name="password"
+                id="password"
+                minlength="6"
+                required
+              />
+            </label>
+            <label for="passwordConfirmation">
+              Confirmer le mot de passe
+              <input
+                type="password"
+                name="passwordConfirmation"
+                id="passwordConfirmation"
+                minlength="6"
+                required
+              />
+            </label>
+            <button type="submit">S'inscrire</button>
+          </form>
+
+          {/* Formulaire de connexion */}
+          <form method="post" class="form">
+            <input type="hidden" name="action" value="login" />
+            <label for="email">
+              Email
+              <input type="email" name="email" id="email" required />
+            </label>
+            <label for="password">
+              Mot de passe
+              <input
+                type="password"
+                name="password"
+                id="password"
+                minlength="6"
+                required
+              />
+            </label>
+            <button type="submit">Se connecter</button>
+          </form>
+        </>
+      )
+    }
   </div>
 </Layout>
