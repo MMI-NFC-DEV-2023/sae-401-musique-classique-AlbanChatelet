@@ -2,7 +2,7 @@
 /* Pas de besoin de script setup ici, on va utiliser un script classique dans le fichier */
 ---
 
-<header class="bg-gray-800 text-white p-4 shadow-md">
+<header class="bg-fond_cards text-white p-4 shadow-md">
   <nav class="flex justify-between items-center">
     <!-- Logo ou titre -->
     <div class="text-2xl font-bold">
@@ -18,35 +18,50 @@
       <!-- Affichage du menu burger ou de la croix selon l'état -->
       <span
         id="burgerIcon"
-        class="block w-6 h-0.5 bg-white mb-1 transition-transform duration-200"
+        class="block w-6 h-0.5 bg-jaune_petant mb-1 transition-transform duration-200"
       ></span>
       <span
         id="burgerIcon2"
-        class="block w-6 h-0.5 bg-white mb-1 transition-transform duration-200"
+        class="block w-6 h-0.5 bg-jaune_petant mb-1 transition-transform duration-200"
       ></span>
       <span
         id="burgerIcon3"
-        class="block w-6 h-0.5 bg-white transition-transform duration-200"
+        class="block w-6 h-0.5 bg-jaune_petant transition-transform duration-200"
       ></span>
     </button>
 
     <!-- Liens de navigation -->
     <div id="menuLinks" class="space-x-6 hidden lg:flex">
-      <a href="/" class="hover:text-yellow-400">Accueil</a>
-      <a href="/compositeurs" class="hover:text-yellow-400">Compositeurs</a>
-      <a href="/oeuvres" class="hover:text-yellow-400">Oeuvres</a>
-      <a href="/formations" class="hover:text-yellow-400">Formations</a>
+      <a href="/" class="hover:text-yellow-400 text-jaune_petant">Accueil</a>
+      <a href="/compositeurs" class="hover:text-yellow-400 text-jaune_petant"
+        >Compositeurs</a
+      >
+      <a href="/oeuvres" class="hover:text-yellow-400 text-jaune_petant"
+        >Oeuvres</a
+      >
+      <a href="/formations" class="hover:text-yellow-400 text-jaune_petant"
+        >Formations</a
+      >
     </div>
   </nav>
 
   <!-- Menu mobile -->
   <div
     id="mobileMenu"
-    class="lg:hidden bg-gray-800 text-white space-y-4 p-4 hidden"
+    class="lg:hidden bg-fond_cards text-jaune_petant space-y-4 p-4 hidden"
   >
-    <a href="/" class="block hover:text-yellow-400">Accueil</a>
-    <a href="/compositeurs" class="block hover:text-yellow-400">Compositeurs</a>
-    <a href="/oeuvres" class="block hover:text-yellow-400">Oeuvres</a>
+    <a href="/" class="block hover:text-yellow-400 text-jaune_petant">Accueil</a
+    >
+    <a
+      href="/compositeurs"
+      class="block hover:text-yellow-400 text-jaune_petant">Compositeurs</a
+    >
+    <a href="/oeuvres" class="block hover:text-yellow-400 text-jaune_petant"
+      >Oeuvres</a
+    >
+    <a href="/formations" class="hover:text-yellow-400 text-jaune_petant"
+      >Formations</a
+    >
   </div>
 </header>
 

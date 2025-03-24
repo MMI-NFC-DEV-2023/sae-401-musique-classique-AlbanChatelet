@@ -12,6 +12,9 @@ const pb = new PocketBase("https://sae303.pockethost.io"); // Utilisation de l'U
 
 // Récupération de l'ID du compositeur depuis les paramètres
 const { id } = Astro.params;
+const oeuvres = await pb.collection("oeuvres").getFullList({
+  expand: "compositeur",
+});
 
 if (!id) {
   console.error("❌ ID manquant pour la page compositeur.");
@@ -39,6 +42,9 @@ const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
 ---
 
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <link rel="stylesheet" href="/src/styles/global.css" />
 </head>
 
@@ -50,14 +56,16 @@ const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
     : "Compositeur introuvable"}
 >
   <section
-    class="flex flex-col items-center min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 text-white py-12"
+    class="flex flex-col items-center min-h-screen bg-black text-white py-12"
   >
     {
       compositeur ? (
         <>
-          <h1 class="text-4xl font-bold mb-6 tracking-wide">
-            {compositeur.nom}
-          </h1>
+          <div class="container mx-auto text-center">
+            <h1 class="text-4xl text-jaune_petant papyrus mb-6 tracking-wide">
+              {compositeur.nom}
+            </h1>
+          </div>
           <p class="text-gray-400 mb-4">
             Année de naissance : {compositeur.date_naissance}
           </p>
@@ -65,27 +73,55 @@ const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
             <img
               src={`${baseUrl}/api/files/compositeurs/${compositeur.id}/${compositeur.photo}`}
               alt={`Photo de ${compositeur.nom}`}
-              class="w-32 h-32 mx-auto mb-4 rounded-full object-cover"
+              class="w-5/6  rounded-xl h-auto mb-4 object-cover"
             />
           )}
+          <div class="container  text-left">
+            <h1 class="text-lg text-white mx-4 mulish text-light  mb-6 tracking-wide">
+              {compositeur.intitule}
+            </h1>
+          </div>
 
-          {/* Affichage des œuvres du compositeur */}
+          <div class="container  text-left">
+            <h1 class="font-bold text-2xl text-white mulish mx-4 text-left pb-4">
+              Biographie
+            </h1>
+            <h1 class="text-lg text-white mx-4 mulish text-light mb-6 tracking-wide">
+              {compositeur.biographie}
+            </h1>
+          </div>
+          <div class="container mx-auto text-center pt-8">
+            <h1 class="text-jaune_petant papyrus text-2xl px-4">
+              Oeuvres majeures
+            </h1>
+          </div>
+          {/* Affichage des œuvres du compositeur sous forme de cartes */}
           {compositeur.expand?.oeuvres &&
             compositeur.expand.oeuvres.length > 0 && (
-              <div class="mt-6 p-4 bg-gray-800 rounded-lg w-full max-w-3xl">
-                <h2 class="text-2xl font-semibold mb-3">Œuvres :</h2>
-                <ul class="list-disc pl-5 space-y-1">
-                  {compositeur.expand.oeuvres.map((oeuvre) => (
-                    <li key={oeuvre.id}>
-                      <LinkOeuvre
-                        oeuvre={{
-                          id: oeuvre.id,
-                          titre: oeuvre.titre,
-                        }}
+              <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4 w-full max-w-5xl mx-auto">
+                {compositeur.expand.oeuvres.map((oeuvre) => (
+                  <div
+                    key={oeuvre.id}
+                    class="bg-fond_cards p-4 rounded-lg shadow-lg transition duration-300 hover:scale-105"
+                  >
+                    {oeuvre.cover && (
+                      <img
+                        src={`${baseUrl}/api/files/oeuvres/${oeuvre.id}/${oeuvre.cover}`}
+                        alt={`Cover de ${oeuvre.titre}`}
+                        class="w-full h-auto object-cover rounded-lg mb-4"
                       />
-                    </li>
-                  ))}
-                </ul>
+                    )}<LinkOeuvre
+                      oeuvre={{
+                        id: oeuvre.id,
+                        titre: oeuvre.titre,
+                      }}/>
+                    <h2 class="text-lg font-light text-white">
+                      {oeuvre.annee}
+                    </h2>
+                    
+                    
+                  </div>
+                ))}
               </div>
             )}
         </>
@@ -95,3 +131,22 @@ const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
     }
   </section>
 </Layout>
+<style>
+  .papyrus {
+    font-family: "Papyrus", sans-serif;
+  }
+
+  .fond_accueil {
+    background-image: url("/src/assets/fond_accueil_sae.png");
+    background-size: cover;
+    background-position: center;
+  }
+
+  .opensans {
+    font-family: "Open Sans Hebrew Condensed", sans-serif;
+  }
+
+  .mulish {
+    font-family: "Mulish", sans-serif;
+  }
+</style>

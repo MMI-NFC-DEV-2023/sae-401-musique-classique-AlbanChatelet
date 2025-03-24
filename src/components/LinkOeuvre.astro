@@ -3,12 +3,13 @@ interface LinkOeuvreProps {
   oeuvre: {
     id: string;
     titre: string;
+    cover: string;
   };
 }
 
 const { oeuvre } = Astro.props;
 ---
 
-<a href={`/oeuvres/${oeuvre.id}`} class="text-blue-400 hover:underline">
+<a href={`/oeuvres/${oeuvre.id}`} class="text-white text-2xl font-semibold">
   {oeuvre.titre}
 </a>
