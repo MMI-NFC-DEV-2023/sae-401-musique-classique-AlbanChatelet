@@ -1,0 +1,198 @@
+---
+import HeaderPage from "../../components/HeaderPage.astro";
+import Layout from "../../layouts/Layout.astro";
+import LinkCompositeur from "../../components/LinkCompositeur.astro";
+import PocketBase from "pocketbase";
+import "/public/styles/global.css"; // Import propre du CSS
+import LinkInterpretation from "../../components/LinkInterpretation.astro";
+import LinkFormation from "../../components/LinkFormation.astro";
+import FooterPage from "../../components/FooterPage.astro";
+export const prerender = false;
+
+const { id } = Astro.params;
+
+if (!id) {
+  console.error("❌ ID manquant pour la page œuvre.");
+  throw new Error("ID manquant pour la page œuvre.");
+}
+
+const pb = new PocketBase("https://sae303.pockethost.io");
+
+let oeuvre = null;
+let interpretations = [];
+let formations = [];
+
+async function fetchData() {
+  try {
+    console.log("📡 Récupération des interprétations...");
+    interpretations = await pb.collection("interpretations").getFullList({
+      filter: `titre_oeuvre = "${id}"`,
+    });
+
+    console.log(
+      "✅ Interprétations récupérées :",
+      JSON.stringify(interpretations, null, 2)
+    );
+  } catch (error) {
+    console.error("❌ Erreur interprétations :", error);
+  }
+
+  if (interpretations.length > 0) {
+    const interpretationIds = interpretations.map((i) => i.id);
+
+    console.log("🧐 IDs des interprétations récupérés :", interpretationIds);
+
+    try {
+      console.log("📡 Récupération des formations...");
+      formations = await pb.collection("formations").getFullList({
+        filter: `interpretations = "${interpretationIds[0]}"`,
+      });
+
+      console.log(
+        "✅ Formations récupérées :",
+        JSON.stringify(formations, null, 2)
+      );
+    } catch (error) {
+      console.error("❌ Erreur formations :", error);
+    }
+  }
+
+  try {
+    console.log(
+      "📡 Récupération de l'œuvre avec ses interprétations et compositeur..."
+    );
+    oeuvre = await pb.collection("oeuvres").getOne(id, {
+      expand: "compositeur,interpretations.titre_oeuvre",
+    });
+
+    console.log("✅ Œuvre récupérée :", JSON.stringify(oeuvre, null, 2));
+  } catch (error) {
+    console.error("❌ Erreur lors de la récupération de l'œuvre :", error);
+  }
+}
+
+// Exécution immédiate de la récupération des données
+await fetchData();
+
+const baseUrl = "https://sae303.pockethost.io";
+---
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/public/styles/global.css" />
+</head>
+
+<HeaderPage />
+<Layout pageTitle={oeuvre ? `Détails de ${oeuvre.titre}` : "Œuvre introuvable"}>
+  <section
+    class="flex flex-col items-center min-h-screen bg-black text-white py-12"
+  >
+    {
+      oeuvre ? (
+        <>
+          <h1 class="text-4xl font-bold mb-6 papyrus text-jaune_petant tracking-wide">
+            {oeuvre.titre}
+          </h1>
+
+          {/* Affichage du compositeur */}
+          {oeuvre.expand?.compositeur && (
+            <p class="text-lg text-white pb-6">
+              Composé par :
+              <LinkCompositeur
+                compositeur={{
+                  id: oeuvre.expand.compositeur.id,
+                  nom: oeuvre.expand.compositeur.nom,
+                }}
+              />
+            </p>
+          )}
+
+          {/* Affichage de la cover de l'œuvre */}
+          {oeuvre.cover && (
+            <img
+              src={`${baseUrl}/api/files/oeuvres/${oeuvre.id}/${oeuvre.cover}`}
+              alt={`Photo de ${oeuvre.titre}`}
+              class="w-5/6 h-full mx-auto mb-4 object-cover"
+            />
+          )}
+
+          {/* Affichage des autres informations de l'œuvre si disponibles */}
+          {oeuvre.annee && <p>Année de sortie : {oeuvre.annee}</p>}
+
+          {/* Affichage des interprétations sous forme de cartes */}
+          {interpretations.length > 0 && (
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+              <h2 class="text-3xl font-semibold mb-3 papyrus text-jaune_petant">
+                Interprétations
+              </h2>
+              {interpretations.map((interpretation) => {
+                const formationAssociee = formations.find((f) =>
+                  f.interpretations.includes(interpretation.id)
+                );
+
+                return (
+                  <div
+                    key={interpretation.id}
+                    class="bg-fond_cards p-6 rounded-lg shadow-lg text-center"
+                  >
+                    <h3 class="text-xl font-semibold mb-2">
+                      {interpretation.titre}
+                    </h3>
+                    <p class="text-xl mulish text-jaune_petant mb-3">
+                      {interpretation.annee_sortie}
+                    </p>
+
+                    {/* Affichage du lien Spotify */}
+                    {interpretation.lien_spotify && (
+                      <a
+                        href={interpretation.lien_spotify}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-block mt-3 px-4 py-2 bg-spotify text-black rounded-md hover:bg-green-700"
+                      >
+                        Spotify
+                      </a>
+                    )}
+                    {interpretation.lien_deezer && (
+                      <a
+                        href={interpretation.lien_deezer}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-block mt-3 px-4 py-2 bg-deezer text-white rounded-md hover:bg-purple-700"
+                      >
+                        Deezer
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      ) : (
+        <p class="text-red-500 text-center">Œuvre introuvable.</p>
+      )
+    }
+  </section><FooterPage />
+</Layout>
+
+<style>
+  .papyrus {
+    font-family: "Papyrus", sans-serif;
+  }
+
+  .fond_accueil {
+    background-image: url("/src/assets/fond_accueil_sae.png");
+    background-size: cover;
+    background-position: center;
+  }
+
+  .opensans {
+    font-family: "Open Sans Hebrew Condensed", sans-serif;
+  }
+
+  .mulish {
+    font-family: "Mulish", sans-serif;
+  }
+</style>
