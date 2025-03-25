@@ -1,4 +1,6 @@
 # Astro Starter Kit: Basics
+Lien du site : https://iamclassic.albanchatelet.fr/
+
 
 ```sh
 npm create astro@latest -- --template basics
