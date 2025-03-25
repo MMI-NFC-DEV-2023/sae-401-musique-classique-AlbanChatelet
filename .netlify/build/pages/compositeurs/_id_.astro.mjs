@@ -1,9 +1,9 @@
 import { f as createComponent, g as createAstro, m as maybeRenderHead, i as addAttribute, r as renderTemplate, j as renderHead, k as renderComponent, l as Fragment } from '../../chunks/astro/server_lHe0fd0m.mjs';
 import 'kleur/colors';
 import 'html-escaper';
-import { $ as $$HeaderPage, b as $$Layout, a as $$FooterPage } from '../../chunks/FooterPage_C9gHu3DB.mjs';
+import { $ as $$HeaderPage, b as $$Layout, a as $$FooterPage } from '../../chunks/FooterPage_LUWHQNIt.mjs';
 import PocketBase from 'pocketbase';
-/* empty css                                   */
+/* empty css                                            */
 import 'clsx';
 /* empty css                                   */
 export { renderers } from '../../renderers.mjs';

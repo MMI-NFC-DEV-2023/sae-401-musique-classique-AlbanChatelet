@@ -1,7 +1,7 @@
 ---
 import PocketBase from "pocketbase"; // Assure-toi que PocketBase est bien importé
 import Layout from "../layouts/Layout.astro"; // Layout de la page
-
+import "/public/styles/global.css"; // Import propre du CSS
 // URL de ton instance PocketBase
 const pb = new PocketBase("https://sae303.pockethost.io");
 import HeaderPage from "../components/HeaderPage.astro";

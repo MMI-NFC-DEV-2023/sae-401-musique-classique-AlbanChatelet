@@ -4,6 +4,7 @@ import FooterPage from "../components/FooterPage.astro";
 import Layout from "../layouts/Layout.astro";
 import PocketBase from "pocketbase"; // Importation de PocketBase
 import LinkOeuvre from "../components/LinkOeuvre.astro";
+import "/public/styles/global.css"; // Import propre du CSS
 export const prerender = false;
 import LinkCompositeur from "../components/LinkCompositeur.astro";
 import LinkInterpretation from "../components/LinkInterpretation.astro";
@@ -47,20 +48,23 @@ const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
           Plongez dans l'univers intemporel des grands maîtres de la musique
           classique.
         </h1>
-        <div class="pt-8 pb-6"><a href="/compositeurs">
-          <button
-            class="bg-[#AE3939] h-[60px] opensans text-white font-bold py-2 px-6 rounded-[16px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105"
+        <div class="pt-8 pb-6">
+          <a href="/compositeurs">
+            <button
+              class="bg-[#AE3939] h-[60px] opensans text-white font-bold py-2 px-6 rounded-[16px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105"
+            >
+              Voir les compositeurs
+            </button></a
           >
-            Voir les compositeurs
-          </button></a>
         </div>
         <div class="pb-32">
           <a href="/oeuvres">
-          <button
-            class="bg-couleur_or h-[60px] opensans text-white font-bold py-2 px-6 rounded-[16px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105"
+            <button
+              class="bg-couleur_or h-[60px] opensans text-white font-bold py-2 px-6 rounded-[16px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105"
+            >
+              Les oeuvres
+            </button></a
           >
-            Les oeuvres
-          </button></a>
         </div>
       </div>
     </section>
@@ -255,7 +259,6 @@ const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
       </div><FooterPage />
     </section>
   </main>
-  
 </Layout>
 <style>
   .papyrus {

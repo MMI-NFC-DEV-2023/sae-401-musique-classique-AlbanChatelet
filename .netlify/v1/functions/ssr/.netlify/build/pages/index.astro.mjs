@@ -1,8 +1,9 @@
 import { f as createComponent, j as renderHead, k as renderComponent, r as renderTemplate, i as addAttribute } from '../chunks/astro/server_lHe0fd0m.mjs';
 import 'kleur/colors';
 import 'html-escaper';
-import { b as $$Layout, $ as $$HeaderPage, a as $$FooterPage } from '../chunks/FooterPage_C9gHu3DB.mjs';
+import { b as $$Layout, $ as $$HeaderPage, a as $$FooterPage } from '../chunks/FooterPage_LUWHQNIt.mjs';
 import PocketBase from 'pocketbase';
+/* empty css                                         */
 import { $ as $$LinkCompositeur } from '../chunks/LinkCompositeur_BSTphBnr.mjs';
 import { $ as $$LinkInterpretation } from '../chunks/LinkInterpretation_BGNsb7Qt.mjs';
 /* empty css                                 */
@@ -24,7 +25,7 @@ const $$Index = createComponent(async ($$result, $$props, $$slots) => {
   return renderTemplate`<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="/public/styles/global.css">${renderHead()}</head> ${renderComponent($$result, "Layout", $$Layout, { "pageTitle": "Accueil", "data-astro-cid-j7pv25f6": true }, { "default": async ($$result2) => renderTemplate` ${renderComponent($$result2, "HeaderPage", $$HeaderPage, { "data-astro-cid-j7pv25f6": true })} <main data-astro-cid-j7pv25f6> <!-- Section d'introduction --> <section class="fond_accueil bg-cover bg-center p-8 sm:p-16" data-astro-cid-j7pv25f6> <div class="container mx-auto text-center" data-astro-cid-j7pv25f6> <h1 class="text-jaune_petant papyrus text-xl sm:text-2xl md:text-3xl px-4 pb-32 leading-snug" data-astro-cid-j7pv25f6>
 Plongez dans l'univers intemporel des grands maîtres de la musique
           classique.
-</h1> <div class="pt-8 pb-6" data-astro-cid-j7pv25f6><a href="/compositeurs" data-astro-cid-j7pv25f6> <button class="bg-[#AE3939] h-[60px] opensans text-white font-bold py-2 px-6 rounded-[16px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105" data-astro-cid-j7pv25f6>
+</h1> <div class="pt-8 pb-6" data-astro-cid-j7pv25f6> <a href="/compositeurs" data-astro-cid-j7pv25f6> <button class="bg-[#AE3939] h-[60px] opensans text-white font-bold py-2 px-6 rounded-[16px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105" data-astro-cid-j7pv25f6>
 Voir les compositeurs
 </button></a> </div> <div class="pb-32" data-astro-cid-j7pv25f6> <a href="/oeuvres" data-astro-cid-j7pv25f6> <button class="bg-couleur_or h-[60px] opensans text-white font-bold py-2 px-6 rounded-[16px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105" data-astro-cid-j7pv25f6>
 Les oeuvres

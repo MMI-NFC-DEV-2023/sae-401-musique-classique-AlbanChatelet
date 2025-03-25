@@ -2,7 +2,8 @@ import { f as createComponent, g as createAstro, j as renderHead, k as renderCom
 import 'kleur/colors';
 import 'html-escaper';
 import PocketBase from 'pocketbase';
-import { $ as $$HeaderPage, a as $$FooterPage, b as $$Layout } from '../chunks/FooterPage_C9gHu3DB.mjs';
+import { $ as $$HeaderPage, a as $$FooterPage, b as $$Layout } from '../chunks/FooterPage_LUWHQNIt.mjs';
+/* empty css                                         */
 /* empty css                                         */
 export { renderers } from '../renderers.mjs';
 
