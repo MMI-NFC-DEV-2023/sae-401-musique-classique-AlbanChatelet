@@ -1,0 +1,299 @@
+---
+import PocketBase from "pocketbase"; // Assure-toi que PocketBase est bien importé
+import Layout from "../layouts/Layout.astro"; // Layout de la page
+
+// URL de ton instance PocketBase
+const pb = new PocketBase("https://sae303.pockethost.io");
+import HeaderPage from "../components/HeaderPage.astro";
+import FooterPage from "../components/FooterPage.astro";
+export const prerender = false; // Pas de pré-rendu pour cette page
+
+// Vérifie si un code d'autorisation GitHub est présent dans l'URL
+const urlParams = new URLSearchParams(Astro.request.url);
+const code = urlParams.get("code");
+
+if (code) {
+  // Si le code est présent, tente de se connecter avec GitHub
+  try {
+    const githubAuthResponse = await pb
+      .collection("users")
+      .authWithOAuth("github", code);
+    Astro.locals.successMessage = "Connexion réussie via GitHub !";
+  } catch (error) {
+    if (error instanceof Error) {
+      Astro.locals.errorMessage = `Erreur lors de la connexion via GitHub : ${error.message}`;
+    } else {
+      Astro.locals.errorMessage =
+        "Erreur inconnue lors de la connexion via GitHub.";
+    }
+  }
+}
+
+// Gestion de la soumission du formulaire
+if (Astro.request.method === "POST") {
+  const data = await Astro.request.formData();
+  const email = data.get("email") as string;
+  const password = data.get("password") as string;
+  const passwordConfirmation = data.get("passwordConfirmation") as string;
+  const action = data.get("action") as string; // Identifier si c'est pour s'inscrire ou se connecter
+
+  // Vérification des champs
+  if (action === "signup") {
+    // Inscription
+    if (password !== passwordConfirmation) {
+      Astro.locals.errorMessage = "Les mots de passe ne correspondent pas.";
+      return;
+    }
+
+    if (!email || !email.includes("@")) {
+      Astro.locals.errorMessage = "L'email est invalide.";
+      return;
+    }
+
+    if (password.length < 6) {
+      Astro.locals.errorMessage =
+        "Le mot de passe doit être d'au moins 6 caractères.";
+      return;
+    }
+
+    // Création de l'utilisateur dans PocketBase
+    try {
+      const response = await pb.collection("users").create({
+        email: email,
+        password: password,
+        passwordConfirm: password, // Assure-toi que la confirmation du mot de passe est égale au mot de passe
+      });
+      Astro.locals.successMessage =
+        "Inscription réussie ! Vous pouvez maintenant vous connecter.";
+    } catch (error) {
+      if (error instanceof Error) {
+        Astro.locals.errorMessage = `Erreur lors de l'inscription : ${error.message}`;
+      } else {
+        Astro.locals.errorMessage = "Erreur inconnue lors de l'inscription.";
+      }
+    }
+  } else if (action === "login") {
+    // Connexion
+    try {
+      const authResponse = await pb
+        .collection("users")
+        .authWithPassword(email, password);
+      Astro.locals.successMessage = "Connexion réussie !";
+      // Tu peux rediriger l'utilisateur ici, par exemple vers une page d'accueil
+    } catch (error) {
+      if (error instanceof Error) {
+        Astro.locals.errorMessage = `Erreur lors de la connexion : ${error.message}`;
+      } else {
+        Astro.locals.errorMessage = "Erreur inconnue lors de la connexion.";
+      }
+    }
+  } else if (action === "logout") {
+    // Déconnexion
+    try {
+      pb.authStore.clear(); // Déconnecte l'utilisateur
+      Astro.locals.successMessage = "Déconnexion réussie !";
+    } catch (error) {
+      if (error instanceof Error) {
+        Astro.locals.errorMessage = `Erreur lors de la déconnexion : ${error.message}`;
+      } else {
+        Astro.locals.errorMessage = "Erreur inconnue lors de la déconnexion.";
+      }
+    }
+  }
+}
+
+const isLoggedIn = pb.authStore.isValid; // Vérifie si l'utilisateur est connecté
+---
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="public/styles/global.css" />
+</head>
+<HeaderPage />
+<Layout pageTitle="Inscription / Connexion">
+  <section class="bg-black">
+    <div class="container mx-auto p-4">
+      <h1
+        class="text-3xl font-semibold papyrus text-jaune_petant text-center mb-6"
+      >
+        Inscription / Connexion
+      </h1>
+
+      {/* Affichage des messages d'erreur ou de succès */}
+      {
+        Astro.locals.successMessage && (
+          <div class="bg-green-100 text-green-800 p-4 rounded-lg mb-4">
+            <p>{Astro.locals.successMessage}</p>
+          </div>
+        )
+      }
+      {
+        Astro.locals.errorMessage && (
+          <div class="bg-red-100 text-red-800 p-4 rounded-lg mb-4">
+            <p>{Astro.locals.errorMessage}</p>
+          </div>
+        )
+      }
+
+      {/* Si l'utilisateur est connecté, afficher un bouton de déconnexion */}
+      {
+        isLoggedIn ? (
+          <form method="post" class="text-center">
+            <input type="hidden" name="action" value="logout" />
+            <button
+              type="submit"
+              class="bg-[#AE3939] text-white opensans font-semibold py-3 px-5 mt-28 rounded-lg shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+            >
+              Se déconnecter
+            </button>
+            <div class="pb-[400px]">
+              <p class="text-jaune_petant mulish pt-4">Vous êtes connecté</p>
+            </div>
+          </form>
+        ) : (
+          <>
+            {/* Formulaire d'inscription */}
+            <form
+              method="post"
+              class=" max-w-md mx-auto p-6 bg-fond_cards rounded-lg shadow-lg mb-6"
+            >
+              <input type="hidden" name="action" value="signup" />
+              <label
+                for="email"
+                class="block text-lg font-medium text-jaune_petant mb-2"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                required
+                class="w-full p-3 border-2 border-jaune_petant rounded-md mb-4"
+              />
+              <label
+                for="password"
+                class="block text-lg font-medium text-jaune_petant mb-2"
+              >
+                Mot de passe
+              </label>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                minlength="6"
+                required
+                class="w-full p-3 border-2 border-jaune_petant rounded-md mb-4"
+              />
+              <label
+                for="passwordConfirmation"
+                class="block text-lg font-medium text-jaune_petant mb-2"
+              >
+                Confirmer le mot de passe
+              </label>
+              <input
+                type="password"
+                name="passwordConfirmation"
+                id="passwordConfirmation"
+                minlength="6"
+                required
+                class="w-full p-3 border-2 border-jaune_petant rounded-md mb-6"
+              />
+              <button
+                type="submit"
+                class="w-full bg-[#AE3939] opensans text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                S'inscrire
+              </button>
+            </form>
+
+            {/* Formulaire de connexion */}
+
+            <p class="text-jaune_petant mulish pb-4 md:text-center">
+              Déjà un compte ? Connecte toi !
+            </p>
+            <form
+              method="post"
+              class="max-w-md mx-auto p-6 bg-fond_cards rounded-lg shadow-lg"
+            >
+              <input type="hidden" name="action" value="login" />
+              <label
+                for="email"
+                class="block text-lg font-medium text-jaune_petant mb-2"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                required
+                class="w-full p-3 border-2 border-jaune_petant rounded-md mb-4"
+              />
+              <label
+                for="password"
+                class="block text-lg font-medium text-jaune_petant mb-2"
+              >
+                Mot de passe
+              </label>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                minlength="6"
+                required
+                class="w-full p-3 border-2 border-jaune_petant rounded-md mb-4"
+              />
+              <button
+                type="submit"
+                class="w-full bg-jaune_petant text-black font-semibold py-3 px-5 rounded-lg shadow-lg hover:bg-couleur_or opensans focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+              >
+                Se connecter
+              </button>
+            </form>
+
+            {/* Formulaire de connexion avec GitHub */}
+            <form
+              method="post"
+              action="https://sae303.pockethost.io/api/collections/users/auth/github"
+              class="max-w-md mx-auto p-6 bg-black"
+            >
+              <input type="hidden" name="action" value="github" />
+              <button
+                type="submit"
+                class="w-full bg-[#4078c0] text-white font-semibold py-3 px-5 rounded-lg shadow-lg hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+              >
+                Se connecter avec GitHub
+              </button>
+            </form>
+          </>
+        )
+      }
+    </div>
+  </section><FooterPage />
+</Layout>
+<style>
+  .papyrus {
+    font-family: "Papyrus", sans-serif;
+  }
+
+  .fond_accueil {
+    background-image: url("/src/assets/fond_accueil_sae.png");
+    background-size: cover;
+    background-position: center;
+  }
+
+  .opensans {
+    font-family: "Open Sans Hebrew Condensed", sans-serif;
+  }
+
+  .mulish {
+    font-family: "Mulish", sans-serif;
+  }
+
+  .source_sans_pro {
+    font-family: "Source Sans Pro", sans-serif;
+  }
+</style>
