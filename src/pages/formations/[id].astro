@@ -4,6 +4,7 @@ import Layout from "../../layouts/Layout.astro";
 import PocketBase from "pocketbase";
 import "../../styles/global.css";
 import LinkInterpretation from "../../components/LinkInterpretation.astro";
+import FooterPage from "../../components/FooterPage.astro";
 
 export const prerender = false;
 
@@ -178,7 +179,7 @@ const baseUrl = "https://sae303.pockethost.io";
         <p class="text-red-500 text-center">Formation introuvable.</p>
       )
     }
-  </section>
+  </section><FooterPage />
 </Layout>
 <style>
   .papyrus {

@@ -5,6 +5,7 @@ import Layout from "../layouts/Layout.astro"; // Layout de la page
 // URL de ton instance PocketBase
 const pb = new PocketBase("https://sae303.pockethost.io");
 import HeaderPage from "../components/HeaderPage.astro";
+import FooterPage from "../components/FooterPage.astro";
 export const prerender = false; // Pas de pré-rendu pour cette page
 
 // Vérifie si un code d'autorisation GitHub est présent dans l'URL
@@ -148,9 +149,7 @@ const isLoggedIn = pb.authStore.isValid; // Vérifie si l'utilisateur est connec
               Se déconnecter
             </button>
             <div class="pb-[400px]">
-              <p class="text-jaune_petant mulish pt-4">
-                Vous êtes connecté
-              </p>
+              <p class="text-jaune_petant mulish pt-4">Vous êtes connecté</p>
             </div>
           </form>
         ) : (
@@ -273,7 +272,7 @@ const isLoggedIn = pb.authStore.isValid; // Vérifie si l'utilisateur est connec
         )
       }
     </div>
-  </section>
+  </section><FooterPage />
 </Layout>
 <style>
   .papyrus {

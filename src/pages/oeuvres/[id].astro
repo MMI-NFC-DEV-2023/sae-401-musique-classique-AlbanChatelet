@@ -6,6 +6,7 @@ import PocketBase from "pocketbase";
 import "../../styles/global.css";
 import LinkInterpretation from "../../components/LinkInterpretation.astro";
 import LinkFormation from "../../components/LinkFormation.astro";
+import FooterPage from "../../components/FooterPage.astro";
 export const prerender = false;
 
 const { id } = Astro.params;
@@ -173,7 +174,7 @@ const baseUrl = "https://sae303.pockethost.io";
         <p class="text-red-500 text-center">Œuvre introuvable.</p>
       )
     }
-  </section>
+  </section><FooterPage />
 </Layout>
 
 <style>

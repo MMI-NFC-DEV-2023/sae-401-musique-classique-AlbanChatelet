@@ -4,6 +4,7 @@ import Layout from "../../layouts/Layout.astro";
 import PocketBase from "pocketbase"; // Importation de PocketBase
 import "../../styles/global.css"; // Import propre du CSS
 import LinkOeuvre from "../../components/LinkOeuvre.astro";
+import FooterPage from "../../components/FooterPage.astro";
 
 export const prerender = false;
 
@@ -91,15 +92,12 @@ const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
     {
       compositeur ? (
         <>
-          <div class="container mx-auto text-center">
-            <h1 class="text-4xl text-jaune_petant papyrus mb-6 tracking-wide">
-              {compositeur.nom}
-            </h1>
-          </div><p class="text-white papyrus text-3xl">Période : {compositeur.periode}</p>{" "}
+          <p class="text-white papyrus text-3xl">
+            Période : {compositeur.periode}
+          </p>{" "}
           <p class="text-gray-500 mulish pt-2 mb-4">
             {dateNaissance} - {dateDeces}
           </p>
-          
           {/* Ajout de la période */}
           {compositeur.photo && (
             <img
@@ -169,7 +167,7 @@ const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
         <p class="text-red-500 text-center">Compositeur introuvable.</p>
       )
     }
-  </section>
+  </section><FooterPage />
 </Layout>
 <style>
   .papyrus {

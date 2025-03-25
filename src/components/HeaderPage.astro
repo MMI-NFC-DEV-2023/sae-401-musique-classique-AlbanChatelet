@@ -5,8 +5,10 @@
 <header class="bg-fond_cards text-white p-6 shadow-md">
   <nav class="flex justify-between items-center">
     <!-- Logo ou titre -->
-    <div class="text-2xl font-bold">
-      <a href="/" class="text-white hover:text-yellow-400">MonSite</a>
+    <div class="">
+      <a href="/" class=""
+        ><img src="/logo_music.webp" alt="Logo" class="w-10 h-auto" /></a
+      >
     </div>
 
     <!-- Menu burger pour mobile -->
@@ -32,18 +34,30 @@
 
     <!-- Liens de navigation -->
     <div id="menuLinks" class="space-x-6 hidden lg:flex">
-      <a href="/" class="hover:text-yellow-400 text-jaune_petant">Accueil</a>
-      <a href="/compositeurs" class="hover:text-yellow-400 text-jaune_petant"
-        >Compositeurs</a
+      <a
+        href="/"
+        class="hover:text-yellow-400 text-jaune_petant source_sans_pro font-regular"
+        >ACCUEIL</a
       >
-      <a href="/oeuvres" class="hover:text-yellow-400 text-jaune_petant"
-        >Oeuvres</a
+      <a
+        href="/compositeurs"
+        class="hover:text-yellow-400 text-jaune_petant source_sans_pro font-regular"
+        >COMPOSITEURS</a
       >
-      <a href="/formations" class="hover:text-yellow-400 text-jaune_petant"
-        >Formations</a
+      <a
+        href="/oeuvres"
+        class="hover:text-yellow-400 text-jaune_petant source_sans_pro font-regular"
+        >OEUVRES</a
       >
-      <a href="/auth-register" class="hover:text-yellow-400 text-jaune_petant"
-        >Authentification</a
+      <a
+        href="/formations"
+        class="hover:text-yellow-400 text-jaune_petant source_sans_pro font-regular"
+        >FORMATIONS</a
+      >
+      <a
+        href="/auth-register"
+        class="hover:text-yellow-400 text-jaune_petant source_sans_pro font-regular"
+        >AUTHENTIFICATION</a
       >
     </div>
   </nav>
@@ -51,22 +65,32 @@
   <!-- Menu mobile -->
   <div
     id="mobileMenu"
-    class="lg:hidden bg-fond_cards text-jaune_petant space-y-4 p-4 hidden"
+    class="lg:hidden bg-fond_cards text-jaune_petant space-y-4 p-4 hidden font-regular"
   >
-    <a href="/" class="block hover:text-yellow-400 text-jaune_petant">Accueil</a
+    <a
+      href="/"
+      class="block hover:text-yellow-400 text-jaune_petant source_sans_pro font-regular"
+      >ACCUEIL</a
     >
     <a
       href="/compositeurs"
-      class="block hover:text-yellow-400 text-jaune_petant">Compositeurs</a
+      class="block hover:text-yellow-400 text-jaune_petant source_sans_pro font-regular"
+      >COMPOSITEUR</a
     >
-    <a href="/oeuvres" class="block hover:text-yellow-400 text-jaune_petant"
-      >Oeuvres</a
+    <a
+      href="/oeuvres"
+      class="block hover:text-yellow-400 text-jaune_petant source_sans_pro font-regular"
+      >OEUVRES</a
     >
-    <a href="/formations" class="block hover:text-yellow-400 text-jaune_petant"
-      >Formations</a
+    <a
+      href="/formations"
+      class="block hover:text-yellow-400 text-jaune_petant source_sans_pro font-regular"
+      >FORMATIONS</a
     >
-    <a href="/auth-register" class="hover:text-yellow-400 text-jaune_petant"
-      >Authentification</a
+    <a
+      href="/auth-register"
+      class="hover:text-yellow-400 text-jaune_petant source_sans_pro font-regular"
+      >AUTHENTIFICATION</a
     >
   </div>
 </header>
@@ -99,3 +123,26 @@
     }
   });
 </script>
+<style>
+  .papyrus {
+    font-family: "Papyrus", sans-serif;
+  }
+
+  .fond_accueil {
+    background-image: url("/src/assets/fond_accueil_sae.png");
+    background-size: cover;
+    background-position: center;
+  }
+
+  .opensans {
+    font-family: "Open Sans Hebrew Condensed", sans-serif;
+  }
+
+  .mulish {
+    font-family: "Mulish", sans-serif;
+  }
+
+  .source_sans_pro {
+    font-family: "Source Sans Pro", sans-serif;
+  }
+</style>
