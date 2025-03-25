@@ -2,6 +2,7 @@ import { f as createComponent, j as renderHead, k as renderComponent, r as rende
 import 'kleur/colors';
 import 'html-escaper';
 import { $ as $$HeaderPage, b as $$Layout, a as $$FooterPage } from '../chunks/FooterPage_C9gHu3DB.mjs';
+/* empty css                                */
 import PocketBase from 'pocketbase';
 export { renderers } from '../renderers.mjs';
 
