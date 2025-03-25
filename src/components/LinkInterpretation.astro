@@ -10,6 +10,29 @@ interface LinkInterpretationProps {
 const { interpretation } = Astro.props;
 ---
 
-<a class="text-blue-400 hover:underline">
+<a class="text-white self-start source_sans_pro text-3xl hover:underline">
   {interpretation.nom_interpretation}
 </a>
+<style>
+  .papyrus {
+    font-family: "Papyrus", sans-serif;
+  }
+
+  .fond_accueil {
+    background-image: url("/src/assets/fond_accueil_sae.png");
+    background-size: cover;
+    background-position: center;
+  }
+
+  .opensans {
+    font-family: "Open Sans Hebrew Condensed", sans-serif;
+  }
+
+  .mulish {
+    font-family: "Mulish", sans-serif;
+  }
+
+  .source_sans_pro {
+    font-family: "Source Sans Pro", sans-serif;
+  }
+</style>

@@ -19,57 +19,49 @@ const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
 ---
 
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <link rel="stylesheet" href="/src/styles/global.css" />
 </head>
 
 <HeaderPage />
 <Layout pageTitle="Liste des formations">
   <section
-    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6"
+    class="grid grid-cols-1 sm:grid-cols-2 bg-black md:grid-cols-3 lg:grid-cols-4 gap-12 p-6"
   >
     {
       formations.map((formation) => (
         <div
           key={formation.id}
-          class="bg-gray-800 text-white rounded-lg shadow-lg overflow-hidden"
+          class="bg-fond_cards text-white rounded-lg shadow-lg overflow-hidden"
         >
-          <div class="p-4">
-            <h2 class="text-xl font-bold mb-2">{formation.nom_groupe}</h2>
-          </div>
           {formation.photo && (
             <img
               src={`${baseUrl}/api/files/formations/${formation.id}/${formation.photo}`}
               alt={`Photo de ${formation.nom_groupe}`}
-              class="w-32 h-32 mx-auto mb-4 rounded-full object-cover"
+              class="w-full h-[179px] mx-auto mb-4 object-cover"
             />
           )}
-          {/* Affichage des œuvres associées */}
-          {formation.expand?.interpretation &&
-            formation.expand.interpretation.length > 0 && (
-              <div class="p-4">
-                <p class="text-gray-400 mb-2">Œuvres :</p>
-                <ul class="list-disc pl-5 space-y-1">
-                  {formation.expand.interpretation.map((interpretation) => (
-                    <li key={interpretation.id}>
-                      <LinkInterpretation
-                        interpretation={{
-                          id: interpretation.id,
-                          titre: interpretation.nom_interpretation,
-                        }}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+          <div class="px-4">
+            <h2 class="text-xl font-bold mb-2 text-[#EFDE7C]">
+              {formation.nom_groupe}
+            </h2>
+          </div>
+          <div class="px-4">
+            <h2 class="text-lg mb-2">{formation.intitule}</h2>
+          </div>
+          
 
           {/* Lien vers la page de détails du compositeur */}
-          <a
-            href={`/formations/${formation.id}`}
-            class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            Voir les détails
-          </a>
+          <div class="text-center pt-4 pb-8">
+            <a
+              href={`/formations/${formation.id}`}
+              class="bg-[#AE3939] h-[30px] opensans text-white font-bold py-2 px-6 rounded-[8px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105"
+            >
+              Voir
+            </a>
+          </div>
         </div>
       ))
     }
