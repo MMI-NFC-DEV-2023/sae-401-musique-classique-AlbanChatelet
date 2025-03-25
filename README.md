@@ -1,6 +1,7 @@
 # Astro Starter Kit: Basics
 Lien du site : https://iamclassic.albanchatelet.fr/
 
+Il est conseillé d'aller voir les détailes de Mozart car c'est le compositeur que j'ai le plus détaillé dans la base de données.
 
 ```sh
 npm create astro@latest -- --template basics
