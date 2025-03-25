@@ -1,0 +1,281 @@
+---
+import HeaderPage from "../components/HeaderPage.astro";
+import FooterPage from "../components/FooterPage.astro";
+import Layout from "../layouts/Layout.astro";
+import PocketBase from "pocketbase"; // Importation de PocketBase
+import LinkOeuvre from "../components/LinkOeuvre.astro";
+export const prerender = false;
+import LinkCompositeur from "../components/LinkCompositeur.astro";
+import LinkInterpretation from "../components/LinkInterpretation.astro";
+// Connexion à PocketBase via Pockethost
+const pb = new PocketBase("https://sae303.pockethost.io"); // Utilisation de l'URL de ton instance Pockethost
+
+// Récupération des oeuvres depuis PocketBase
+const compositeurs = (
+  await pb.collection("compositeurs").getFullList({
+    expand: "oeuvres",
+  })
+).slice(0, 3);
+const oeuvres = (
+  await pb.collection("oeuvres").getFullList({
+    expand: "compositeur",
+  })
+).slice(0, 3);
+const formations = (
+  await pb.collection("formations").getFullList({
+    expand: "interpretations",
+  })
+).slice(0, 3);
+const baseUrl = "https://sae303.pockethost.io"; // URL de base de PocketBase
+---
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="/src/styles/global.css" />
+</head>
+<Layout pageTitle="Accueil">
+  <HeaderPage />
+  <main>
+    <!-- Section d'introduction -->
+    <section class="fond_accueil bg-cover bg-center p-8 sm:p-16">
+      <div class="container mx-auto text-center">
+        <h1
+          class="text-jaune_petant papyrus text-xl sm:text-2xl md:text-3xl px-4 pb-32 leading-snug"
+        >
+          Plongez dans l'univers intemporel des grands maîtres de la musique
+          classique.
+        </h1>
+        <div class="pt-8 pb-6"><a href="/compositeurs">
+          <button
+            class="bg-[#AE3939] h-[60px] opensans text-white font-bold py-2 px-6 rounded-[16px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105"
+          >
+            Voir les compositeurs
+          </button></a>
+        </div>
+        <div class="pb-32">
+          <a href="/oeuvres">
+          <button
+            class="bg-couleur_or h-[60px] opensans text-white font-bold py-2 px-6 rounded-[16px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105"
+          >
+            Les oeuvres
+          </button></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section des compositeurs -->
+    <section class="bg-black px-6 py-12">
+      <hr class="border-t-2 border-[#C9A75A] my-6" />
+      <div class="container mx-auto text-center">
+        <h1
+          class="text-jaune_petant papyrus text-2xl sm:text-3xl md:text-4xl px-4 pb-8"
+        >
+          Compositeurs en vedette
+        </h1>
+      </div>
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12"
+      >
+        {
+          compositeurs.map((compositeur) => (
+            <div
+              key={compositeur.id}
+              class="bg-fond_cards text-white rounded-lg shadow-lg overflow-hidden"
+            >
+              {compositeur.photo && (
+                <img
+                  src={`${baseUrl}/api/files/compositeurs/${compositeur.id}/${compositeur.photo}`}
+                  alt={`Photo de ${compositeur.nom}`}
+                  class="w-full h-[179px] mx-auto mb-4 object-cover"
+                />
+              )}
+              <div class="px-4">
+                <h2 class="text-xl font-bold mb-2 text-[#EFDE7C]">
+                  {compositeur.nom}
+                </h2>
+                <h3 class="text-lg mb-2">{compositeur.intitule}</h3>
+              </div>
+              <div class="text-center py-4">
+                <a
+                  href={`/compositeurs/${compositeur.id}`}
+                  class="bg-[#AE3939] h-[30px] opensans text-white font-bold py-2 px-6 rounded-[8px] text-xl shadow-xl transform transition-transform duration-300 hover:scale-105"
+                >
+                  Voir les détails
+                </a>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+      <div class="pt-6 pb-6 text-center">
+        <a href="/compositeurs">
+          <button
+            class="bg-[#AE3939] h-[60px] opensans text-white font-bold py-2 px-6 rounded-[16px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105"
+          >
+            Voir les compositeurs
+          </button>
+        </a>
+      </div>
+    </section>
+
+    <!-- Section des oeuvres -->
+    <section class="bg-black px-6 py-4">
+      <hr class="border-t-2 border-[#C9A75A] my-6" />
+      <div class="container mx-auto text-center">
+        <h1
+          class="text-jaune_petant papyrus text-2xl sm:text-3xl md:text-4xl px-4 pb-6"
+        >
+          Oeuvres connues
+        </h1>
+      </div>
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12"
+      >
+        {
+          oeuvres.map((oeuvre) => (
+            <div
+              key={oeuvre.id}
+              class="bg-[#C9A75A] text-white rounded-lg shadow-lg overflow-hidden"
+            >
+              {oeuvre.cover && (
+                <img
+                  src={`${baseUrl}/api/files/oeuvres/${oeuvre.id}/${oeuvre.cover}`}
+                  alt={`Photo de ${oeuvre.titre}`}
+                  class="w-full h-[176px] mx-auto mb-4 object-cover"
+                />
+              )}
+              <div class="px-4">
+                <h2 class="text-xl font-bold mb-2">{oeuvre.titre}</h2>
+              </div>
+              {oeuvre.expand?.compositeur && (
+                <p class="text-lg px-4 text-fond_cards font-semibold">
+                  Par
+                  <LinkCompositeur
+                    compositeur={{
+                      id: oeuvre.expand.compositeur.id,
+                      nom: oeuvre.expand.compositeur.nom,
+                    }}
+                  />
+                </p>
+              )}
+              <div class="text-center py-6">
+                <a
+                  href={`/oeuvres/${oeuvre.id}`}
+                  class="bg-[#AE3939] h-[60px] opensans text-white font-bold py-2 px-6 rounded-[16px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105"
+                >
+                  Voir les détails
+                </a>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+      <div class="pt-6 text-center">
+        <a href="/oeuvres">
+          <button
+            class="bg-[#AE3939] h-[60px] opensans text-white font-bold py-2 px-6 rounded-[16px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105"
+          >
+            Voir les oeuvres
+          </button>
+        </a>
+      </div>
+    </section>
+
+    <!-- Section des formations -->
+    <section class="bg-black px-6 py-4">
+      <hr class="border-t-2 border-[#C9A75A] my-6" />
+      <div class="container mx-auto text-center">
+        <h1
+          class="text-jaune_petant papyrus text-2xl sm:text-3xl md:text-4xl px-4 pb-6"
+        >
+          Les groupes d'interprètes
+        </h1>
+      </div>
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12"
+      >
+        {
+          formations.map((formation) => (
+            <div
+              key={formation.id}
+              class="bg-fond_cards text-white rounded-lg shadow-lg overflow-hidden"
+            >
+              {formation.photo && (
+                <img
+                  src={`${baseUrl}/api/files/formations/${formation.id}/${formation.photo}`}
+                  alt={`Photo de ${formation.nom_groupe}`}
+                  class="w-full h-[179px] mx-auto mb-4 object-cover"
+                />
+              )}
+              <div class="px-4">
+                <h2 class="text-xl font-bold mb-2 text-[#EFDE7C]">
+                  {formation.nom_groupe}
+                </h2>
+              </div>
+              {formation.expand?.interpretation &&
+                formation.expand.interpretation.length > 0 && (
+                  <div class="p-4">
+                    <p class="text-gray-400 mb-2">Œuvres :</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                      {formation.expand.interpretation.map((interpretation) => (
+                        <li key={interpretation.id}>
+                          <LinkInterpretation
+                            interpretation={{
+                              id: interpretation.id,
+                              titre: interpretation.nom_interpretation,
+                            }}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              <div class="text-center py-4">
+                <a
+                  href={`/formations/${formation.id}`}
+                  class="bg-[#AE3939] h-[30px] opensans text-white font-bold py-2 px-6 rounded-[8px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105"
+                >
+                  Voir les détails
+                </a>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+      <div class="pt-6 text-center">
+        <a href="/formations">
+          <button
+            class="bg-[#AE3939] h-[60px] opensans text-white font-bold py-2 px-6 rounded-[16px] text-2xl shadow-xl transform transition-transform duration-300 hover:scale-105"
+          >
+            Voir les formations
+          </button>
+        </a>
+      </div><FooterPage />
+    </section>
+  </main>
+  
+</Layout>
+<style>
+  .papyrus {
+    font-family: "Papyrus", sans-serif;
+  }
+
+  .fond_accueil {
+    background-image: url("/src/assets/fond_accueil_sae.png");
+    background-size: cover;
+    background-position: center;
+  }
+
+  @media (min-width: 1024px) {
+    .fond_accueil {
+      background-color: black; /* Remplace l'image de fond par du noir en version desktop */
+      background-image: none; /* Supprime l'image de fond */
+    }
+  }
+
+  .opensans {
+    font-family: "Open Sans Hebrew Condensed", sans-serif;
+  }
+</style>
