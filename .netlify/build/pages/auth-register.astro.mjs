@@ -2,7 +2,7 @@ import { f as createComponent, g as createAstro, j as renderHead, k as renderCom
 import 'kleur/colors';
 import 'html-escaper';
 import PocketBase from 'pocketbase';
-import { $ as $$HeaderPage, a as $$FooterPage, b as $$Layout } from '../chunks/FooterPage_jEq6vJNb.mjs';
+import { $ as $$HeaderPage, a as $$FooterPage, b as $$Layout } from '../chunks/FooterPage_C9gHu3DB.mjs';
 /* empty css                                         */
 export { renderers } from '../renderers.mjs';
 
@@ -85,7 +85,7 @@ const $$AuthRegister = createComponent(async ($$result, $$props, $$slots) => {
     }
   }
   const isLoggedIn = pb.authStore.isValid;
-  return renderTemplate`<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="/src/styles/global.css">${renderHead()}</head> ${renderComponent($$result, "HeaderPage", $$HeaderPage, { "data-astro-cid-tkgxdtuz": true })} ${renderComponent($$result, "Layout", $$Layout, { "pageTitle": "Inscription / Connexion", "data-astro-cid-tkgxdtuz": true }, { "default": async ($$result2) => renderTemplate` <section class="bg-black" data-astro-cid-tkgxdtuz> <div class="container mx-auto p-4" data-astro-cid-tkgxdtuz> <h1 class="text-3xl font-semibold papyrus text-jaune_petant text-center mb-6" data-astro-cid-tkgxdtuz>
+  return renderTemplate`<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="public/styles/global.css">${renderHead()}</head> ${renderComponent($$result, "HeaderPage", $$HeaderPage, { "data-astro-cid-tkgxdtuz": true })} ${renderComponent($$result, "Layout", $$Layout, { "pageTitle": "Inscription / Connexion", "data-astro-cid-tkgxdtuz": true }, { "default": async ($$result2) => renderTemplate` <section class="bg-black" data-astro-cid-tkgxdtuz> <div class="container mx-auto p-4" data-astro-cid-tkgxdtuz> <h1 class="text-3xl font-semibold papyrus text-jaune_petant text-center mb-6" data-astro-cid-tkgxdtuz>
 Inscription / Connexion
 </h1>  ${Astro2.locals.successMessage && renderTemplate`<div class="bg-green-100 text-green-800 p-4 rounded-lg mb-4" data-astro-cid-tkgxdtuz> <p data-astro-cid-tkgxdtuz>${Astro2.locals.successMessage}</p> </div>`} ${Astro2.locals.errorMessage && renderTemplate`<div class="bg-red-100 text-red-800 p-4 rounded-lg mb-4" data-astro-cid-tkgxdtuz> <p data-astro-cid-tkgxdtuz>${Astro2.locals.errorMessage}</p> </div>`}  ${isLoggedIn ? renderTemplate`<form method="post" class="text-center" data-astro-cid-tkgxdtuz> <input type="hidden" name="action" value="logout" data-astro-cid-tkgxdtuz> <button type="submit" class="bg-[#AE3939] text-white opensans font-semibold py-3 px-5 mt-28 rounded-lg shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50" data-astro-cid-tkgxdtuz>
 Se déconnecter
@@ -97,7 +97,7 @@ Mot de passe
 Confirmer le mot de passe
 </label> <input type="password" name="passwordConfirmation" id="passwordConfirmation" minlength="6" required class="w-full p-3 border-2 border-jaune_petant rounded-md mb-6" data-astro-cid-tkgxdtuz> <button type="submit" class="w-full bg-[#AE3939] opensans text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" data-astro-cid-tkgxdtuz>
 S'inscrire
-</button> </form> <p class="text-jaune_petant mulish pb-4" data-astro-cid-tkgxdtuz>
+</button> </form> <p class="text-jaune_petant mulish pb-4 md:text-center" data-astro-cid-tkgxdtuz>
 Déjà un compte ? Connecte toi !
 </p> <form method="post" class="max-w-md mx-auto p-6 bg-fond_cards rounded-lg shadow-lg" data-astro-cid-tkgxdtuz> <input type="hidden" name="action" value="login" data-astro-cid-tkgxdtuz> <label for="email" class="block text-lg font-medium text-jaune_petant mb-2" data-astro-cid-tkgxdtuz>
 Email

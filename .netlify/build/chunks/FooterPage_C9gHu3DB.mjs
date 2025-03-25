@@ -8,7 +8,7 @@ const $$Astro = createAstro();
 const $$Layout = createComponent(($$result, $$props, $$slots) => {
   const Astro2 = $$result.createAstro($$Astro, $$props, $$slots);
   Astro2.self = $$Layout;
-  return renderTemplate`<html lang="en" data-astro-cid-sckkx6r4> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="generator"${addAttribute(Astro2.generator, "content")}><title>Astro Basics</title>${renderHead()}</head> <body data-astro-cid-sckkx6r4> ${renderSlot($$result, $$slots["default"])} </body></html>`;
+  return renderTemplate`<html lang="en" data-astro-cid-sckkx6r4> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="generator"${addAttribute(Astro2.generator, "content")}><title>Astro Basics</title><!-- Ajoute ici ton fichier CSS global --><link rel="stylesheet" href="/src/styles/global.css">${renderHead()}</head> <body data-astro-cid-sckkx6r4> ${renderSlot($$result, $$slots["default"])} </body></html>`;
 }, "C:/Users/chate/Documents/GitHub/sae-401-musique-classique-AlbanChatelet/src/layouts/Layout.astro", void 0);
 
 const $$HeaderPage = createComponent(($$result, $$props, $$slots) => {
@@ -16,7 +16,7 @@ const $$HeaderPage = createComponent(($$result, $$props, $$slots) => {
 }, "C:/Users/chate/Documents/GitHub/sae-401-musique-classique-AlbanChatelet/src/components/HeaderPage.astro", void 0);
 
 const $$FooterPage = createComponent(($$result, $$props, $$slots) => {
-  return renderTemplate`${maybeRenderHead()}<footer class="bg-black text-white py-6 mt-16"> <div class="container mx-auto flex flex-col items-center justify-center text-center space-y-4"> <p class="text-lg font-semibold">Musique Classique - Tous droits réservés &copy; 2025</p> <div class="text-sm"> <a href="/auth-register" class="text-[#C9A75A] hover:text-[#EFDE7C] transition-colors duration-300">
+  return renderTemplate`${maybeRenderHead()}<footer class="bg-black text-white py-6"> <div class="container mx-auto flex flex-col items-center justify-center text-center space-y-4"> <p class="text-lg font-semibold">Musique Classique - Tous droits réservés &copy; 2025</p> <div class="text-sm"> <a href="/auth-register" class="text-[#C9A75A] hover:text-[#EFDE7C] transition-colors duration-300">
 Authentification
 </a> </div> <div class="text-xs text-gray-400"> <p>Site réalisé avec ❤️ pour les passionnés de musique classique.</p> </div> </div> </footer>`;
 }, "C:/Users/chate/Documents/GitHub/sae-401-musique-classique-AlbanChatelet/src/components/FooterPage.astro", void 0);

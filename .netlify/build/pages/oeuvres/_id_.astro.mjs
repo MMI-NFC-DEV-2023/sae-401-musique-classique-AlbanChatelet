@@ -1,7 +1,7 @@
 import { f as createComponent, g as createAstro, j as renderHead, k as renderComponent, r as renderTemplate, l as Fragment, i as addAttribute } from '../../chunks/astro/server_lHe0fd0m.mjs';
 import 'kleur/colors';
 import 'html-escaper';
-import { $ as $$HeaderPage, b as $$Layout, a as $$FooterPage } from '../../chunks/FooterPage_jEq6vJNb.mjs';
+import { $ as $$HeaderPage, b as $$Layout, a as $$FooterPage } from '../../chunks/FooterPage_C9gHu3DB.mjs';
 import { $ as $$LinkCompositeur } from '../../chunks/LinkCompositeur_BSTphBnr.mjs';
 import PocketBase from 'pocketbase';
 /* empty css                                   */
@@ -65,7 +65,7 @@ const $$id = createComponent(async ($$result, $$props, $$slots) => {
   }
   await fetchData();
   const baseUrl = "https://sae303.pockethost.io";
-  return renderTemplate`<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="/src/styles/global.css">${renderHead()}</head> ${renderComponent($$result, "HeaderPage", $$HeaderPage, { "data-astro-cid-cfup7upu": true })} ${renderComponent($$result, "Layout", $$Layout, { "pageTitle": oeuvre ? `D\xE9tails de ${oeuvre.titre}` : "\u0152uvre introuvable", "data-astro-cid-cfup7upu": true }, { "default": async ($$result2) => renderTemplate` <section class="flex flex-col items-center min-h-screen bg-black text-white py-12" data-astro-cid-cfup7upu> ${oeuvre ? renderTemplate`${renderComponent($$result2, "Fragment", Fragment, { "data-astro-cid-cfup7upu": true }, { "default": async ($$result3) => renderTemplate` <h1 class="text-4xl font-bold mb-6 papyrus text-jaune_petant tracking-wide" data-astro-cid-cfup7upu> ${oeuvre.titre} </h1> ${oeuvre.expand?.compositeur && renderTemplate`<p class="text-lg text-white pb-6" data-astro-cid-cfup7upu>
+  return renderTemplate`<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="/public/styles/global.css">${renderHead()}</head> ${renderComponent($$result, "HeaderPage", $$HeaderPage, { "data-astro-cid-cfup7upu": true })} ${renderComponent($$result, "Layout", $$Layout, { "pageTitle": oeuvre ? `D\xE9tails de ${oeuvre.titre}` : "\u0152uvre introuvable", "data-astro-cid-cfup7upu": true }, { "default": async ($$result2) => renderTemplate` <section class="flex flex-col items-center min-h-screen bg-black text-white py-12" data-astro-cid-cfup7upu> ${oeuvre ? renderTemplate`${renderComponent($$result2, "Fragment", Fragment, { "data-astro-cid-cfup7upu": true }, { "default": async ($$result3) => renderTemplate` <h1 class="text-4xl font-bold mb-6 papyrus text-jaune_petant tracking-wide" data-astro-cid-cfup7upu> ${oeuvre.titre} </h1> ${oeuvre.expand?.compositeur && renderTemplate`<p class="text-lg text-white pb-6" data-astro-cid-cfup7upu>
 Composé par :
 ${renderComponent($$result3, "LinkCompositeur", $$LinkCompositeur, { "compositeur": {
     id: oeuvre.expand.compositeur.id,
