@@ -96,7 +96,7 @@ const baseUrl = "https://sae303.pockethost.io";
 
           {/* Affichage du compositeur */}
           {oeuvre.expand?.compositeur && (
-            <p class="text-lg text-white">
+            <p class="text-lg text-white pb-6">
               Composé par :
               <LinkCompositeur
                 compositeur={{
@@ -133,12 +133,12 @@ const baseUrl = "https://sae303.pockethost.io";
                 return (
                   <div
                     key={interpretation.id}
-                    class="bg-gray-800 p-6 rounded-lg shadow-lg text-center"
+                    class="bg-fond_cards p-6 rounded-lg shadow-lg text-center"
                   >
                     <h3 class="text-xl font-semibold mb-2">
                       {interpretation.titre}
                     </h3>
-                    <p class="text-xl mulish mb-3">
+                    <p class="text-xl mulish text-jaune_petant mb-3">
                       {interpretation.annee_sortie}
                     </p>
 
